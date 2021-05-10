@@ -1,0 +1,1050 @@
+ 1048  mv data.csv cw.1.csv
+ 1049  sudo chrt -f 60 python3 ./test.py
+ 1050  python3 ./optimize.py 
+ 1051  ls *.csv
+ 1052  mv data.csv cw.2.csv
+ 1053  cp cw.1.csv data.csv
+ 1054  sync
+ 1055  python3 ./optimize.py 
+ 1056  ./blink.py 
+ 1057  sync
+ 1058  ./blink.py 
+ 1059  ls -al *.csv
+ 1060  sync
+ 1061  history | grep sudo
+ 1062  sudo chrt -f 60 python3 ./test.py
+ 1063  cp data.csv ccw.1.csv
+ 1064  sudo chrt -f 60 python3 ./test.py
+ 1065  cp data.csv ccw.2.csv
+ 1066  sudo chrt -f 60 python3 ./test.py
+ 1067  cp data.csv ccw.3.csv
+ 1068  sudo chrt -f 60 python3 ./test.py
+ 1069  cp data.csv ccw.4.csv
+ 1070  ls -al *.csv
+ 1071  cp cw.1.csv cw.1a.csv
+ 1072  cp cw.2.csv cw.2a.csv
+ 1073  sudo rm cw.1.csv
+ 1074  sudo rm cw.2.csv
+ 1075  sudo chrt -f 60 python3 ./test.py
+ 1076  ls -al *.csv
+ 1077  cp data.csv cw.1.csv
+ 1078  sudo chrt -f 60 python3 ./test.py
+ 1079  cp data.csv cw.2.csv
+ 1080  sudo chrt -f 60 python3 ./test.py
+ 1081  cp data.csv cw.3.csv
+ 1082  sudo chrt -f 60 python3 ./test.py
+ 1083  cp data.csv cw.4.csv
+ 1084  ls -al *.csv
+ 1085  sync
+ 1086  python3 
+ 1087  sudo chrt -f 60 python3 ./test.py
+ 1088  tail -10 data.csv
+ 1089  sudo chrt -f 60 python3 ./test.py
+ 1090  tail -200 data.csv
+ 1091  tail -1000 data.csv
+ 1092  tail -2000 data.csv
+ 1093  sync
+ 1094  ./blink.py 
+ 1095  cat /dev/ttyACM0
+ 1096  sudo chrt -f 60 python3 ./test.py
+ 1097  cat /dev/ttyACM0
+ 1098  sudo chrt -f 60 python3 ./test.py
+ 1099  cat /dev/ttyACM0
+ 1100  sudo chrt -f 60 python3 ./test.py
+ 1101  cat /dev/ttyACM0
+ 1102  sudo poweroff
+ 1103  htop
+ 1104  ps -ef
+ 1105  ps -ef | grep -i i2c
+ 1106  ps -ef | grep -i '['
+ 1107  ps -ef | grep -i '\['
+ 1108  ps -ef | grep -i '\$['
+ 1109  ps -ef | grep -i ' \['
+ 1110  cat /proc/interrupts 
+ 1111  lsmod
+ 1112  killall python3
+ 1113  sudo chrt -f 60 ./i2ctest2 1 0 5000
+ 1114  sudo chrt -f 60 ./pololu-rpi-slave-arduino-library/pi/blink.py 
+ 1115  htop
+ 1116  chrt --help
+ 1117  sudo chrt --pid -f 70 218
+ 1118  htop
+ 1119  sudo chrt -f 60 ./i2ctest2 1 0 5000
+ 1120  htop
+ 1121  stress
+ 1122  stress --vm 4 --vm-bytes 256M
+ 1123  cd pololu-rpi-slave-arduino-library/pi
+ 1124  more data.csv
+ 1125  tail data.csv
+ 1126  more data.csv
+ 1127  tail data.csv
+ 1128  more data.csv
+ 1129  tail data.csv
+ 1130  ./server.py 
+ 1131  sudo poweroff
+ 1132  lsblk
+ 1133  lsusb
+ 1134  dmesg
+ 1135  cat /dev/ttyACM0
+ 1136  python3
+ 1137  echo > bno.py
+ 1138  mv bno.py pololu-rpi-slave-arduino-library/pi
+ 1139  cd pololu-rpi-slave-arduino-library/pi
+ 1140  python3
+ 1141  python3 ./bno.py
+ 1142  python3
+ 1143  python3 ./bno.py
+ 1144  sync
+ 1145  sudo poweroff
+ 1146  uptime
+ 1147  who
+ 1148  lsusb
+ 1149  netstat -l -n
+ 1150  sudo apt-get install samba samba-common-bin
+ 1151  smbstatus
+ 1152  sudo smbstatus
+ 1153  sudo vi /etc/samba/smb.conf
+ 1154  sudo smbpasswd -a pi
+ 1155  sudo systemctl restart smbd
+ 1156  dmesg
+ 1157  cat /var/log/messages
+ 1158  netstat -l -n
+ 1159  cat /var/log/messages
+ 1160  ls
+ 1161  killall python3
+ 1162  cd pololu-rpi-slave-arduino-library/pi
+ 1163  ./blink.py 
+ 1164  history
+ 1165  ./motors.py 100 -100 1.0 1
+ 1166  ./motors.py -100 100 1.0 1
+ 1167  ./motors.py -200 200 1.0 1
+ 1168  ./motors.py -100 100 1.0 1
+ 1169  ./motors.py 100 -100 1.0 1
+ 1170  ./motors.py 400 -400 1.0 1
+ 1171  ./motors.py 400 -400 0.1 1
+ 1172  ./motors.py 100 -100 0.1 1
+ 1173  ./motors.py 200 -200 0.1 1
+ 1174  ps -ef | grep py
+ 1175  sudo chrt -f 60 python3 ./test.py
+ 1176  sudo chrt -f 60 python3 ./test.py 1
+ 1177  python3
+ 1178  ./motors.py 200 -200 0.1 1
+ 1179  sudo chrt -f 60 python3 ./test.py 1
+ 1180  ./motors.py 200 -200 0.1 1
+ 1181  sudo chrt -f 60 python3 ./test.py 1
+ 1182  ./motors.py 200 -200 0.1 1
+ 1183  sudo chrt -f 60 python3 ./test.py 1
+ 1184  cat motors.py
+ 1185  sudo chrt -f 60 python3 ./test.py 1
+ 1186  ./motors.py 200 -200 0.1 1
+ 1187  sudo chrt -f 60 python3 ./test.py 1
+ 1188  ./motors.py 200 -200 0.1 1
+ 1189  python3 ./motors.py 200 -200 0.01 1
+ 1190  python3 ./motors.py 20 20  0.01 1
+ 1191  sudo chrt -f 60 python3 ./motors.py 20 20  0.01 1
+ 1192  sudo chrt -f 60 python3 ./motors.py 10 -10  0.01 1
+ 1193  sudo chrt -f 60 python3 ./motors.py 20 -20  0.01 1
+ 1194  sudo chrt -f 60 python3 ./motors.py 30 -30  0.01 1
+ 1195  sudo chrt -f 60 python3 ./motors.py 5 -5  0.01 1
+ 1196  sudo chrt -f 60 python3 ./motors.py 1 -1  0.01 1
+ 1197  sudo chrt -f 60 python3 ./motors.py 2 -2  0.01 1
+ 1198  sudo chrt -f 60 python3 ./motors.py 60 -60  0.01 1
+ 1199  sudo chrt -f 60 python3 ./motors.py 50 -50  0.01 1
+ 1200  sudo chrt -f 60 python3 ./motors.py 1 1  0.01 1
+ 1201  sudo chrt -f 60 python3 ./motors.py 5 5  0.01 1
+ 1202  sudo chrt -f 60 python3 ./motors.py -5 -5  0.01 1
+ 1203  sudo chrt -f 60 python3 ./motors.py -5 5  0.01 1
+ 1204  sudo chrt -f 60 python3 ./motors.py 5 -5  0.01 1
+ 1205  sudo chrt -f 60 python3 ./motors.py 1 -1  0.01 1
+ 1206  sudo chrt -f 60 python3 ./motors.py 10 -10  0.01 1
+ 1207  sudo chrt -f 60 python3 ./motors.py 20 -20  0.01 1
+ 1208  sudo chrt -f 60 python3 ./motors.py 5 -5  0.01 1
+ 1209  sudo chrt -f 60 python3 ./motors.py 1 -1  0.01 1
+ 1210  sudo chrt -f 60 python3 ./motors.py 10 -10  0.01 1
+ 1211  sudo chrt -f 60 python3 ./motors.py 20 -20  0.01 1
+ 1212  sudo chrt -f 60 python3 ./motors.py 40 -40  0.01 1
+ 1213  sudo chrt -f 60 python3 ./motors.py 2 -2  0.01 1
+ 1214  sudo chrt -f 60 python3 ./motors.py 3 -3  0.01 1
+ 1215  sudo chrt -f 60 python3 ./motors.py 4 -4  0.01 1
+ 1216  sudo chrt -f 60 python3 ./motors.py 30 -30  0.01 1
+ 1217  sudo chrt -f 60 python3 ./motors.py 15 -15  0.01 1
+ 1218  sudo chrt -f 60 python3 ./motors.py -5 5  0.01 1
+ 1219  sudo chrt -f 60 python3 ./motors.py -2 2  0.01 1
+ 1220  sudo chrt -f 60 python3 ./motors.py -4 4  0.01 1
+ 1221  sudo chrt -f 60 python3 ./motors.py -5 5  0.01 1
+ 1222  sudo chrt -f 60 python3 ./motors.py -10 10 0.01 1
+ 1223  sudo chrt -f 60 python3 ./motors.py -40 40 0.01 1
+ 1224  sudo chrt -f 60 python3 ./motors.py -30 30 0.01 1
+ 1225  sudo chrt -f 60 python3 ./motors.py -20 20 0.01 1
+ 1226  sudo chrt -f 60 python3 ./motors.py -5 5 0.01 1
+ 1227  sudo chrt -f 60 python3 ./motors.py -25 25 0.01 1
+ 1228  sudo chrt -f 60 python3 ./motors.py -45 45 0.01 1
+ 1229  sudo chrt -f 60 python3 ./motors.py -50 50 0.01 1
+ 1230  sudo chrt -f 60 python3 ./motors.py -48 48 0.01 1
+ 1231  sudo chrt -f 60 python3 ./motors.py -45 45 0.01 1
+ 1232  sudo chrt -f 60 python3 ./motors.py 45 45 0.01 1
+ 1233  sudo chrt -f 60 python3 ./motors.py -45 -45 0.01 1
+ 1234  sudo chrt -f 60 python3 ./motors.py -45 45 0.01 1
+ 1235  sudo chrt -f 60 python3 ./motors.py -40 40 0.01 1
+ 1236  sudo chrt -f 60 python3 ./motors.py -10 10 0.01 1
+ 1237  sudo chrt -f 60 python3 ./motors.py -20 20 0.01 1
+ 1238  sudo chrt -f 60 python3 ./motors.py -1 1 0.01 1
+ 1239  sudo chrt -f 60 python3 ./motors.py 1 1 0.01 1
+ 1240  sudo chrt -f 60 python3 ./motors.py 2 2 0.01 1
+ 1241  sudo chrt -f 60 python3 ./motors.py -2 -2 0.01 1
+ 1242  sudo chrt -f 60 python3 ./motors.py 2 2 0.01 1
+ 1243  sudo chrt -f 60 python3 ./motors.py 5 5 0.01 1
+ 1244  sudo chrt -f 60 python3 ./motors.py -2 -2 0.01 1
+ 1245  sudo chrt -f 60 python3 ./motors.py -12 -12 0.01 1
+ 1246  sudo chrt -f 60 python3 ./motors.py 5 5 0.01 1
+ 1247  sudo chrt -f 60 python3 ./motors.py 15 15 0.01 1
+ 1248  sudo chrt -f 60 python3 ./motors.py -12 -12 0.01 1
+ 1249  sudo chrt -f 60 python3 ./motors.py 15 15 0.01 1
+ 1250  sudo chrt -f 60 python3 ./motors.py 10 -10 0.01 1
+ 1251  sync
+ 1252  sudo poweroff
+ 1253  cd pololu-rpi-slave-arduino-library/pi/
+ 1254  sudo chrt -f 60 python3 ./test.py 1
+ 1255  history | grep avr
+ 1256  sudo chrt -f 60 python3 ./test.py 3
+ 1257  sudo chrt -f 60 python3 ./test.py 1
+ 1258  cd pololu-rpi-slave-arduino-library/pi/
+ 1259  history
+ 1260  history | grep avr
+ 1261  cat /dev/ttyACM0
+ 1262  ./bno.py
+ 1263  chmod 755 ./bno.py
+ 1264  ./bno.py
+ 1265  ls *.hex
+ 1266  avrdude -v -patmega2560 -cwiring -P/dev/ttyACM0 -b115200 -D -Uflash:w:game_rotation_vectors_at_100hz.hex:i
+ 1267  ls
+ 1268  cat notes.txt 
+ 1269  ./bno.py
+ 1270  history
+ 1271  ./bno.py
+ 1272  history | grep avr
+ 1273  ./bno.py
+ 1274  avrdude -v -patmega2560 -cwiring -P/dev/ttyACM0 -b115200 -D -Uflash:w:rotation_vectors_at_100hz.hex:i
+ 1275  ./bno.py
+ 1276  history | grep mot
+ 1277  sudo chrt -f 60 python3 ./motors.py 10 -10 0.01 1
+ 1278  sudo chrt -f 60 python3 ./motors.py 30 -30 0.01 1
+ 1279  sudo chrt -f 60 python3 ./motors.py 5 -5 0.01 1
+ 1280  sudo chrt -f 60 python3 ./motors.py 40 -40 0.01 1
+ 1281  ps -ef
+ 1282  killall python3
+ 1283  cd pololu-rpi-slave-arduino-library/pi
+ 1284  history
+ 1285  sudo chrt -f 60 python3 ./motors.py 20 -20 0.01 1
+ 1286  sudo chrt -f 60 python3 ./motors.py -20 -5 0.01 1
+ 1287  sudo chrt -f 60 python3 ./motors.py -5 5 0.01 1
+ 1288  sudo chrt -f 60 python3 ./motors.py -20 20 0.01 1
+ 1289  sudo chrt -f 60 python3 ./motors.py -40 40 0.01 1
+ 1290  sudo chrt -f 60 python3 ./motors.py -30 30 0.01 1
+ 1291  sudo chrt -f 60 python3 ./motors.py 5 -5 0.01 1
+ 1292  sudo chrt -f 60 python3 ./motors.py 20 -20 0.01 1
+ 1293  sudo chrt -f 60 python3 ./motors.py 40 -40 0.01 1
+ 1294  sudo chrt -f 60 python3 ./motors.py -5 5 0.01 1
+ 1295  sudo chrt -f 60 python3 ./motors.py -20 20 0.01 1
+ 1296  sudo chrt -f 60 python3 ./motors.py -40 40 0.01 1
+ 1297  sudo chrt -f 60 python3 ./motors.py -5 5 0.01 1
+ 1298  sudo chrt -f 60 python3 ./motors.py 5 -5 0.01 1
+ 1299  sudo chrt -f 60 python3 ./motors.py 40 -40 0.01 1
+ 1300  sudo chrt -f 60 python3 ./motors.py 20 -20 0.01 1
+ 1301  sudo chrt -f 60 python3 ./motors.py -20 20 0.01 1
+ 1302  cat /dev/ttyACM0
+ 1303  killall python3
+ 1304  sudo chrt -f 60 python3 ./test.py 1
+ 1305  sudo chrt -f 60 python3 ./test.py 3
+ 1306  sudo chrt -f 60 python3 ./test.py 5
+ 1307  sudo chrt -f 60 python3 ./test.py 9
+ 1308  ./blink.py 
+ 1309  cat /dev/ttyACM0
+ 1310  lsmod
+ 1311  lsmod | sort
+ 1312  dmesg
+ 1313  lsmod | sort
+ 1314  dmesg
+ 1315  lsmod | sort
+ 1316  dmesg
+ 1317  lsmod | sort
+ 1318  dmesg
+ 1319  lsmod | sort
+ 1320  uname -a
+ 1321  htop
+ 1322  ls /lib/modules/
+ 1323  uname -a
+ 1324  ls /boot
+ 1325  ls -al /boot
+ 1326  ls /lib/modules
+ 1327  find /lib/modules/5.4.83-v7l+/
+ 1328  find /lib/modules/5.4.83-v7l+/ | grep '\.ko'
+ 1329  find /lib/modules/5.4.83-v7l+/ | grep '\.ko' | wc
+ 1330  lsmod | wc
+ 1331  lsmod | sort
+ 1332  dmesg | grep wifi
+ 1333  dmesg | grep wi
+ 1334  dmesg | grep wl
+ 1335  dmesg 
+ 1336  lsmod
+ 1337  lsmod | grep nf
+ 1338  cd
+ 1339  sync
+ 1340  lsmod | sort
+ 1341  lsmod |  grep -v 'Module' | sort
+ 1342  sync
+ 1343  sudo poweroff
+ 1344  htop
+ 1345  cpufreq-info
+ 1346  htop
+ 1347  dmesg
+ 1348  lsmod
+ 1349  lsmod | wc
+ 1350  dmesg
+ 1351  cat /dev/ttyACM0
+ 1352  sudo poweroff
+ 1353  sudo bash
+ 1354  htop
+ 1355  stress 
+ 1356  stress --vm 4 --vm-bytes 128M
+ 1357  stress --vm 4 --vm-bytes 256M
+ 1358  htop
+ 1359  cd pololu-rpi-slave-arduino-library/pi/
+ 1360  ls
+ 1361  ./blink.py 
+ 1362  htop
+ 1363  ls /proc/interrupts 
+ 1364  cat /proc/interrupts 
+ 1365  htop
+ 1366  sudo bash
+ 1367  cd pololu-rpi-slave-arduino-library/pi/
+ 1368  ls
+ 1369  ls -al
+ 1370  cat notes.txt 
+ 1371  avrdude -v -patmega2560 -cwiring -P/dev/ttyACM0 -b115200 -D -Uflash:w:game_rotation_vectors_at_100hz.hex:i
+ 1372  ./bno.py 
+ 1373  cd pololu-rpi-slave-arduino-library/pi
+ 1374  ./blink.py 
+ 1375  sync
+ 1376  sudo poweroff
+ 1377  cat /dev/ttyACM0
+ 1378  cat /dev/ttyACM1
+ 1379  cat /dev/ttyUSB0
+ 1380  htloop
+ 1381  htop
+ 1382  sudo bash
+ 1383  sudo bash
+ 1384  python3
+ 1385  python3 -m serial.tools.list_ports
+ 1386  python3
+ 1387  cd pololu-rpi-slave-arduino-library/pi
+ 1388  echo > serial_test.py
+ 1389  python3 ./serial_test.py 
+ 1390  sudo chrt -f 60 python3 ./serial_test.py 
+ 1391  setserial -a -v /dev/ttyUSB0
+ 1392  sudo chrt -f 60 python3 ./serial_test.py 
+ 1393  sudo chrt -f 60 python3 ./serial_test.py  > /dev/null
+ 1394  python3
+ 1395  dmesg
+ 1396  setserial -a -v /dev/ttyUSB0
+ 1397  setserial -a -v /dev/ttyUSB0 low_latency
+ 1398  sudo setserial -a -v /dev/ttyUSB0 low_latency
+ 1399  sudo setserial -a -v /dev/ttyUSB0 
+ 1400  miniterm /dev/ttyUSB0 
+ 1401  sudo chrt -f 60 python3 ./serial_test.py 
+ 1402  cat /dev/ttyUSB0
+ 1403  lsusb
+ 1404  lsmod
+ 1405  sudo chrt -f 60 python3 ./serial_test.py 
+ 1406  sudo chrt -f 40 python3 ./serial_test.py 
+ 1407  chrt -p 80
+ 1408  sudo chrt -p -f 70 80
+ 1409  chrt -p 80
+ 1410  sudo chrt -f 40 python3 ./serial_test.py 
+ 1411  sudo chrt -p -f 40 23677
+ 1412  sudo chrt -f 40 python3 ./serial_test.py 
+ 1413  sudo chrt -p -f 40 20392
+ 1414  sudo chrt -f 40 python3 ./serial_test.py 
+ 1415  sudo chrt -p -f 40 26353
+ 1416  sudo chrt -f 40 python3 ./serial_test.py 
+ 1417  sudo chrt -p -f 40 27886
+ 1418  sudo chrt -p -f 40 26947
+ 1419  sudo chrt -f 40 python3 ./serial_test.py 
+ 1420  lsusb
+ 1421  dmesg
+ 1422  sudo chrt -f 40 python3 ./serial_test.py 
+ 1423  setserial -a -v /dev/ttyUSB1
+ 1424  setserial -a -v /dev/ttyUSB1 low_latency
+ 1425  sudo setserial -a -v /dev/ttyUSB1 low_latency
+ 1426  setserial -a -v /dev/ttyUSB1
+ 1427  sudo chrt -f 40 python3 ./serial_test.py 
+ 1428  sudo chrt -p -f 40 31390
+ 1429  sudo chrt -p -f 40 2
+ 1430  sudo chrt -p -f 40 12
+ 1431  sudo chrt -p -f 40 21
+ 1432  sudo chrt -p -f 40 27
+ 1433  sudo chrt -p -f 40 33
+ 1434  sudo chrt -f 40 python3 ./serial_test.py 
+ 1435  sudo chrt -p -f 40 23493
+ 1436  sudo chrt -f 40 python3 ./serial_test.py 
+ 1437  sudo chrt -p -f 40 23493
+ 1438  sudo chrt -p -f 40 32493
+ 1439  sudo chrt -f 40 python3 ./serial_test.py 
+ 1440  sudo chrt -p -f 40 1796
+ 1441  sudo chrt -f 40 python3 ./serial_test.py 
+ 1442  history 
+ 1443  history | grep python
+ 1444  python3 -m serial.tools.list_ports
+ 1445  miniterm /dev/ttyACM0 115200
+ 1446  sudo setserial -a -v /dev/ttyACM0 low_latency
+ 1447  sudo setserial -a -v /dev/ttyAMA0 low_latency
+ 1448  sudo chrt -f 40 python3 ./serial_test.py 
+ 1449  python3
+ 1450  sudo chrt -f 40 python3 ./serial_test.py 
+ 1451  dmesg
+ 1452  dmesg | grep -C 10 -i "ard"
+ 1453  lsusb
+ 1454  sudo chrt -f 40 python3 ./serial_test.py 
+ 1455  dmesg
+ 1456  miniterm /dev/ttyACM1 115200
+ 1457  sudo setserial -a -v /dev/ttyACM1
+ 1458  sudo setserial -a -v /dev/ttyACM1 low_latency
+ 1459  sudo chrt -f 40 python3 ./serial_test.py 
+ 1460  sudo chrt -p -f 40 9109
+ 1461  sudo chrt -p -f 40 10160
+ 1462  sudo chrt -p -f 40 10001
+ 1463  sudo chrt -p -f 40 7539
+ 1464  sudo chrt -f 40 python3 ./serial_test.py 
+ 1465  sudo chrt -p -f 40 8392
+ 1466  sudo chrt -f 40 python3 ./serial_test.py 
+ 1467  i2cdetect -y 2
+ 1468  i2cdetect -y 1
+ 1469  i2cdetect -y 0
+ 1470  ls /dev/i*
+ 1471  sudo chrt -f 40 python3 ./serial_test.py 
+ 1472  file ./i2c-mcp2221.ko 
+ 1473  lsusb
+ 1474  ls /sys/bus/usb/devices/
+ 1475  find /sys/bus/usb/devices/
+ 1476  ls -lR /sys/bus/usb/devices/
+ 1477  mount
+ 1478  mount | grep sys
+ 1479  cd /sys/bus/usb/devices
+ 1480  ls
+ 1481  ls -al
+ 1482  ls '1-0:1.0'
+ 1483  modprobe i2c-dev
+ 1484  modprobe --help
+ 1485  cd /home/pi/pololu-rpi-slave-arduino-library/pi/
+ 1486  sudo modprobe ./i2c-mcp2221.ko 
+ 1487  sudo insmod ./i2c-mcp2221.ko 
+ 1488  file i2c-mcp2221.ko 
+ 1489  file /lib/modules/5.10.13-rt26-v7l+/kernel/drivers/spi/spi-bcm2835.ko 
+ 1490  insmod --help
+ 1491  sudo insmod ./i2c-mcp2221.ko 
+ 1492  history | grep make
+ 1493  chmod 644 *.ko
+ 1494  sudo insmod ./i2c-mcp2221.ko 
+ 1495  depmod
+ 1496  depmod -a
+ 1497  sudo insmod ./i2c-mcp2221.ko 
+ 1498  dmesg
+ 1499  cat /var/log/messages
+ 1500  sudo insmod ./i2c-mcp2221.ko 
+ 1501  tail /var/log/messages
+ 1502  modprobe i2c-dev
+ 1503  sudo insmod ./i2c-mcp2221.ko 
+ 1504  dmesg
+ 1505  dmesg | tail
+ 1506  sudo insmod ./i2c-mcp2221.ko 
+ 1507  dmesg | tail
+ 1508  ls -al *.ko
+ 1509  sudo insmod ./i2c-mcp2221.ko 
+ 1510  dmesg
+ 1511  uname -a
+ 1512  lsmod
+ 1513  lsmod | grep mcp
+ 1514  lsmod | grep hid
+ 1515  lsmod
+ 1516  iwconfig
+ 1517  iw
+ 1518  insmod /tmp/hid-mcp2221.ko 
+ 1519  sudo insmod /tmp/hid-mcp2221.ko 
+ 1520  dmesg
+ 1521  uname -a
+ 1522  ls /boot
+ 1523  ls -al /boot
+ 1524  cd pololu-rpi-slave-arduino-library/pi/
+ 1525  ls
+ 1526  lsmod
+ 1527  device descriptor read/64, error -110
+ 1528  [ 6206.108173] usb 1-1.3: device descriptor read/64, error -110
+ 1529  [ 6206.275954] usb 1-1.3: new full-speed USB device number 11 using xhci_hcd
+ 1530  history
+ 1531  lsusb
+ 1532  ls /dev/ttyA*
+ 1533  ls /dev/ttyA* /dev/ttyU*
+ 1534  cat serial_test.py 
+ 1535  python3 ./serial_test.py 
+ 1536  miniterm /dev/ttyACM0 115200
+ 1537  python3 ./serial_test.py 
+ 1538  sudo chrt -f 60 python3 ./serial_test.py 
+ 1539  stress 
+ 1540  stress --vm 4 --vm-bytes 256M
+ 1541  cd pololu-rpi-slave-arduino-library/pi
+ 1542  ls *.py
+ 1543  mv /tmp/t.py .
+ 1544  python3 ./t.py
+ 1545  sudo chrt -f 60 python3 ./t.py
+ 1546  vi t.py
+ 1547  sudo chrt -f 60 python3 ./t.py
+ 1548  vi t.py
+ 1549  sudo chrt -f 60 python3 ./t.py
+ 1550  vi t.py
+ 1551  sudo chrt -f 60 python3 ./t.py
+ 1552  sudo chrt -f 99 python3 ./t.py
+ 1553  sudo chrt -f 60 python3 ./t.py 1000 0
+ 1554  sudo chrt -f 60 python3 ./t.py 10 0
+ 1555  sudo chrt -f 60 python3 ./t.py 1 0
+ 1556  sudo chrt -f 60 python3 ./t.py 1000 0
+ 1557  python3 ./t.py 1000 0
+ 1558  python3 ./t.py 1000 75
+ 1559  python3 ./t.py 1000 77
+ 1560  python3 ./t.py 1000 79
+ 1561  sudo chrt -f 60 python3 ./t.py 1000 77
+ 1562  sudo chrt -f 60 python3 ./t.py 1000 17
+ 1563  sudo chrt -f 60 python3 ./t.py 1000 18
+ 1564  sudo chrt -f 60 python3 ./t.py 1000 15
+ 1565  who
+ 1566  cd
+ 1567  git clone --depth 1 https://github.com/ifurusato/ros.git
+ 1568  cd ros
+ 1569  ls
+ 1570  ls -al
+ 1571  ./clock_test.py 
+ 1572  sudo pip3 install pytest
+ 1573  ls *.py
+ 1574  cd pololu-rpi-slave-arduino-library/pi
+ 1575  ls -al *.py
+ 1576  htop
+ 1577  sudo apt update
+ 1578  stress 
+ 1579  stress --vm 4 --vm-bytes 128M
+ 1580  htop
+ 1581  sudo apt install sntp
+ 1582  sntp 
+ 1583  sntp  --help
+ 1584  sntp  
+ 1585  sntp  time.nist.gov
+ 1586  sudo sntp  time.nist.gov
+ 1587  sudo sntp  -d 2 time.nist.gov
+ 1588  sudo sntp  -d 2 192.168.2.1
+ 1589  sudo sntp  -d 2 localhost
+ 1590  sudo sntp  -d 2 time.nist.gov
+ 1591  date
+ 1592  man sntp
+ 1593  cat /etc/crontab 
+ 1594  cat /etc/cron.hourly/fake-hwclock 
+ 1595  cat /etc/cron.d/.placeholder 
+ 1596  sudo sntp  -d 2 time.nist.gov
+ 1597  sudo sntp  time.nist.gov
+ 1598  sudo sntp  -Ss time.nist.gov
+ 1599  sudo sntp  time.nist.gov
+ 1600  while true; do sudo sntp  time.nist.gov | grep time ; sleep 1 ; done
+ 1601  ntp
+ 1602  ps -ef | grep chr
+ 1603  chronyc --help
+ 1604  man chronyc
+ 1605  chronyc
+ 1606  chronyc localhost
+ 1607  chronyc
+ 1608  man chronyc
+ 1609  service --status-all
+ 1610  systemctl
+ 1611  systemctl | grep chron
+ 1612  man systemctl
+ 1613  systemctl | grep time
+ 1614  systemctl stop
+ 1615  systemctl stop chrony.service
+ 1616  sudo systemctl stop chrony.service
+ 1617  sudo systemctl stop time-sync.target
+ 1618  ps -ef | grep chr
+ 1619  ps -ef | grep ntp
+ 1620  sudo sntp -Ss time.nist.gov
+ 1621  sudo sntp  time.nist.gov
+ 1622  date
+ 1623  date --set "15:52:45"
+ 1624  sudo date --set "15:52:45"
+ 1625  date
+ 1626  sudo sntp  time.nist.gov
+ 1627  sudo sntp  -Ss  time.nist.gov
+ 1628  sudo sntp  -c 10  time.nist.gov
+ 1629  sudo sntp  -v -c 10  time.nist.gov
+ 1630  sudo sntp  time.nist.gov
+ 1631  dmesg
+ 1632  cat /var/log/messages
+ 1633  service --status-all
+ 1634  service --status-all | grep -E 'chrony|time|clock|ntp'
+ 1635  systemctl | grep -E 'chrony|time|clock|ntp'
+ 1636  sudo sntp  time.nist.gov
+ 1637  while true; do sudo sntp  time.nist.gov | grep time ; sleep 1 ; done
+ 1638  while true; do sudo sntp  -4 time.nist.gov | grep time ; sleep 1 ; done
+ 1639  while true; do sudo sntp  -6 time.nist.gov | grep time ; sleep 1 ; done
+ 1640  while true; do sudo chrt -f 2 sntp  -6 time.nist.gov | grep time ; sleep 1 ; done
+ 1641  cat /var/log/messages
+ 1642  dmesg
+ 1643  while true; do sudo chrt -f 2 sntp  -6 time.nist.gov | grep time ; sleep 1 ; done
+ 1644  while true; do sudo chrt -f 2 sntp  -6 time.nist.gov | grep time ; sleep 0.1 ; done
+ 1645  while true; do sudo chrt -f 2 sntp  -6 time.nist.gov | grep time ; sleep 1 ; done
+ 1646  while true; do sudo chrt -f 2 sntp  -6 time.nist.gov | grep time ; sleep 2 ; done
+ 1647  ping time.nist.gov
+ 1648  while true; do sudo chrt -f 2 sntp  -6 pool.tnp.org | grep time ; sleep 2 ; done
+ 1649  while true; do sudo chrt -f 2 sntp  -6 pool.ntp.org | grep time ; sleep 2 ; done
+ 1650  ping pool.ntp.org
+ 1651  while true; do sudo chrt -f 2 sntp  -4 pool.ntp.org | grep time ; sleep 2 ; done
+ 1652  sudo sntp pool.ntp.org
+ 1653  sudo sntp us.pool.ntp.org
+ 1654  ping us.pool.ntp.org
+ 1655  ping ntp-a.nist.gov
+ 1656  ping ntp-b.nist.gov
+ 1657  sudo sntp ntp-b.nist.gov
+ 1658  sudo sntp ntp-d.nist.gov
+ 1659  sudo sntp time.google.com
+ 1660  ping time.google.com
+ 1661  sudo sntp time.google.com
+ 1662  sudo sntp -4 time.google.com
+ 1663  sudo sntp -Ss -4 time.google.com
+ 1664  sudo sntp -4 time.google.com
+ 1665  sntp -4 time.google.com
+ 1666  sntp --help
+ 1667  sntp -4 time.google.com
+ 1668  ls -al /var/lib/sntp
+ 1669  cat /var/lib/sntp/kod 
+ 1670  sntp -K /tmp/kod -4 time.google.com
+ 1671  touch /tmp/kod
+ 1672  sntp -K /tmp/kod -4 time.google.com
+ 1673  sntp -K /tmp/kod -4 -Ss time.google.com
+ 1674  sudo sntp -K /tmp/kod -4 -Ss time.google.com
+ 1675  history | grep system
+ 1676  sntp -K /tmp/kod -4 time.google.com
+ 1677  service --status-all
+ 1678  systemctl | grep cron
+ 1679  ps -ef  | grep cron
+ 1680  ps -ef  | grep -E 'cron|chrony|ntp'
+ 1681  ps -ef  | grep -E 'cron|chrony|ntp' | grep -v 'grep'
+ 1682  sudo systemclt stop cron.service
+ 1683  sudo systemctl stop cron.service
+ 1684  systemctl | grep -E 'cron|chrony|ntp'
+ 1685  ps -ef  | grep -E 'cron|chrony|ntp' | grep -v 'grep'
+ 1686  service --status-all | grep -e 'cron|chrony|ntp' | grep -v 'grep'
+ 1687  service --status-all | grep -E 'cron|chrony|ntp' | grep -v 'grep'
+ 1688  stress --vm 4 --vm-bytes 128M
+ 1689  history | grep sntp
+ 1690  sntp -4 time.google.com
+ 1691  sntp -K /tmp/kod -4 time.google.com
+ 1692  sudo sntp -Ss -K /tmp/kod -4 time.google.com
+ 1693  sntp -K /tmp/kod -4 time.google.com
+ 1694  cd
+ 1695  ls
+ 1696  cd bcm2835-1.67/
+ 1697  ls
+ 1698  ls -al
+ 1699  cd test-
+ 1700  cd test-driver
+ 1701  ./test-driver 
+ 1702  cd examples/
+ 1703  ls
+ 1704  ls -al
+ 1705  cd i2c
+ 1706  ls
+ 1707  ls -al
+ 1708  more i2c.c
+ 1709  lsmod
+ 1710  cd ..
+ 1711  ls
+ 1712  cd ..
+ 1713  cd src
+ 1714  ls
+ 1715  ls -al
+ 1716  ./test
+ 1717  sudo ./test
+ 1718  cat test.log
+ 1719  make
+ 1720  rm test
+ 1721  make
+ 1722  ls -al
+ 1723  make all
+ 1724  cd ..
+ 1725  ls
+ 1726  make
+ 1727  cd src
+ 1728  ls
+ 1729  ls -al
+ 1730  cd ..
+ 1731  make test
+ 1732  cd src
+ 1733  ls
+ 1734  ls -al
+ 1735  more Makefile
+ 1736  ls
+ 1737  cc
+ 1738  ls -al
+ 1739  gcc -o test test.c
+ 1740  gcc -o test test.c -lbcm2835
+ 1741  ls -al
+ 1742  ./test
+ 1743  gcc -o test test.c -lbcm2835
+ 1744  sudo ./test
+ 1745  gcc -o test test.c -lbcm2835
+ 1746  sudo ./test
+ 1747  gcc -o test test.c -lbcm2835
+ 1748  sudo ./test
+ 1749  stress --vm 4 --vm-bytes 256M
+ 1750  cd
+ 1751  cd pololu-rpi-slave-arduino-library/
+ 1752  stress --vm 4 --vm-bytes 256M
+ 1753  stress
+ 1754  stress --vm 16 --vm-bytes 64M
+ 1755  cd ros
+ 1756  ./clock_test.py 
+ 1757  sudo pip3 install pyyaml
+ 1758  ./clock_test.py 
+ 1759  sudo chrt -f 60 ./clock_test.py 
+ 1760  cd ..
+ 1761  cd pololu-rpi-slave-arduino-library/pi
+ 1762  ls -al *.py
+ 1763  python3 ./t.py
+ 1764  sudo chrt -f 60 python3 ./t.py
+ 1765  import sys
+ 1766  sudo chrt -f 60 python3 ./t.py
+ 1767  ls -al t.py
+ 1768  sudo chrt -f 60 python3 ./t.py 50000 25
+ 1769  sudo chrt -f 60 python3 ./t.py 50000 18
+ 1770  sudo chrt -f 60 python3 ./t.py 50000 22
+ 1771  python3 ./t.py 50000 0
+ 1772  sudo chrt -f 2 python3 ./t.py 50000 0
+ 1773  sudo chrt -f 2 python3 ./t.py 50000 20
+ 1774  sudo chrt -f 2 python3 ./t.py 2400 0
+ 1775  sudo chrt -f 2 python3 ./t.py 10000 0
+ 1776  sudo chrt -f 2 python3 ./t.py 50000 0
+ 1777  sudo cyclictest 
+ 1778  sudo cyclictest -p 2
+ 1779  sudo cyclictest -m -p 2
+ 1780  sudo cyclictest -m -p 90
+ 1781  cyclictest --help
+ 1782  sudo cyclictest -m -n -p 90
+ 1783  sudo chrt -f 2 python3 ./t.py 50000 0
+ 1784  cd /ros
+ 1785  cd
+ 1786  cd ros
+ 1787  sudo chrt -f 2 ./clock_test.py 
+ 1788  history
+ 1789  cd
+ 1790  cd pololu-rpi-slave-arduino-library/
+ 1791  cd pi
+ 1792  ./blink.py 
+ 1793  killall python3
+ 1794  lsmod
+ 1795  lsmod | grep i2c
+ 1796  sudo rmmod i2c_dev
+ 1797  sudo rmmod i2c_bcm2835
+ 1798  sudo modprobe i2c_dev
+ 1799  lsmod | grep i2c
+ 1800  sudo modprobe i2c_bcm2836
+ 1801  sudo modprobe i2c_bcm2835
+ 1802  dmesg
+ 1803  ./blink.py 
+ 1804  htop
+ 1805  cyclictest --help
+ 1806  sudo cyclictest -n -m -p 99
+ 1807  sync
+ 1808  ls
+ 1809  python3 ./t.py
+ 1810  python3 ./t.py 50000 0
+ 1811  sudo chrt -f 99 python3 ./t.py 50000 0
+ 1812  sudo cyclictest -n -m -p 99
+ 1813  sudo vi /boot/cmdline.txt 
+ 1814  sudo reboot
+ 1815  htop
+ 1816  taskset -c -p 1336
+ 1817  htop
+ 1818  stress --vm 4 --vm-bytes 128M
+ 1819  setserial /dev/ttyUSB0
+ 1820  setserial /dev/ttyUSB0 115200
+ 1821  setserial /dev/ttyUSB0 -b 115200
+ 1822  setserial
+ 1823  setserial /dev/ttyUSB0 spd_vhi
+ 1824  sudo setserial /dev/ttyUSB0 spd_vhi
+ 1825  stty /dev/ttyUSB0
+ 1826  stty --help
+ 1827  stty speed -f /dev/ttyUSB0
+ 1828  stty speed /dev/ttyUSB0
+ 1829  stty speed /  printf("reg=0x%08X   *reg=0x%08X\r\n",reg,timeout);dev/ttyUSB0
+ 1830  stty -F /dev/ttyUSB0 -a
+ 1831  stty -F /dev/ttyUSB0 -speed 115200
+ 1832  stty -F /dev/ttyUSB0 speed 
+ 1833  stty -F /dev/ttyUSB0 speed 115200
+ 1834  stty -F /dev/ttyUSB0 speed 
+ 1835  dd if=/dev/zero of=/dev/ttyUSB0
+ 1836  lsblk
+ 1837  sudo dd if=/dev/sda bs=1M of=/dev/null
+ 1838  dd if=/dev/zero of=/dev/ttyUSB0
+ 1839  miniterm /dev/ttyUSB0 115200
+ 1840  dd if=/dev/zero of=/dev/ttyUSB0 bs=16
+ 1841  dd if=/dev/zero of=/dev/ttyUSB0 bs=8
+ 1842  dd if=/dev/zero of=/dev/ttyUSB0 bs=1
+ 1843  dd if=/dev/zero of=/dev/ttyUSB0 bs=16
+ 1844  miniterm /dev/ttyUSB0 230400
+ 1845  dd if=/dev/zero of=/dev/ttyUSB0 bs=16
+ 1846  sudo apt install sshuttle
+ 1847  man sshuttle 
+ 1848  ping 52.23.167.88
+ 1849  ping -s 1000 52.23.167.88
+ 1850  iperf3 
+ 1851  52.23.167.88
+ 1852  iperf3 -c -N -p 80 52.23.167.88
+ 1853  iperf3 -c 52.23.167.88 -N -p 80
+ 1854  iperf3 -u -c 52.23.167.88 -N -p 80
+ 1855  iperf3 -V -u -c 52.23.167.88 -N -p 80
+ 1856  iperf3 -V -u -c 52.23.167.88 
+ 1857  iperf3 -d -V -u -c 52.23.167.88 
+ 1858  iperf3 -V -u -c 52.23.167.88 
+ 1859  iperf3 -V -u -b 2M -c 52.23.167.88 
+ 1860  iperf3 -V -u -b 5M -c 52.23.167.88 
+ 1861  iperf3 -V -u -b 6M -c 52.23.167.88 
+ 1862  iperf3 -V -u -b 5M -c 52.23.167.88 
+ 1863  sshuttle 
+ 1864  man sshuttle
+ 1865  ssh --help
+ 1866  ssh -i ~/ec2key4.pem ubuntu@52.23.167.88
+ 1867  chmod 400 ~/ec2*
+ 1868  ssh -i ~/ec2key4.pem ubuntu@52.23.167.88
+ 1869  ps -ef | grep python
+ 1870  netstat -l
+ 1871  netstat -l -n
+ 1872  sshuttle -r ubuntu@s52.23.167.88 0/0
+ 1873  sshuttle -r ubuntu@52.23.167.88 0/0
+ 1874  sshuttle -r ubuntu@52.23.167.88 0/0 --ssh-cmd 'ssh -i ~/ec2key.pem'
+ 1875  ls ~
+ 1876  sshuttle -r ubuntu@52.23.167.88 0/0 --ssh-cmd 'ssh -i ~/ec2key4.pem'
+ 1877  whoami
+ 1878  ls
+ 1879  ssh -N -R :5001:localhost:5001 -i ~/ec2key4.pem ubuntu@52.23.167.88
+ 1880  ssh -v -v -N -R :5001:localhost:5001 -i ~/ec2key4.pem ubuntu@52.23.167.88
+ 1881  sync
+ 1882  htop
+ 1883  raspistill
+ 1884  export DISPLAY=
+ 1885  Xorg 
+ 1886  sudo Xorg
+ 1887  sudo lightdm
+ 1888  ps
+ 1889  ps -ef | grep -i x
+ 1890  lightdm
+ 1891  ps -ef | grep -i dm
+ 1892  ps -ef | grep X
+ 1893  startx
+ 1894  sudo startx
+ 1895  raspi-config 
+ 1896  sudo raspi-config 
+ 1897  htop
+ 1898  dmesg
+ 1899  cat /var/log/messages
+ 1900  tail -f /var/log/messages
+ 1901  ps -eLf
+ 1902  ps -ef
+ 1903  ps -eLf | grep X
+ 1904  sync
+ 1905  sudo reboot
+ 1906  systemctl
+ 1907  systemctl | grep -i x
+ 1908  systemctl | grep -i lx
+ 1909  systemctl | grep X
+ 1910  systemctl | grep -i dis
+ 1911  ps -ef | grep X
+ 1912  tail /var/log/messages
+ 1913  ps -ef | grep X
+ 1914  man colord
+ 1915  ps -ef | grep X
+ 1916  ps -ef | grep x
+ 1917  uname -a
+ 1918  sudo raspi-config
+ 1919  htop
+ 1920  which code
+ 1921  sudo apt update
+ 1922  sudo apt install code -y
+ 1923  cd Downloads/
+ 1924  ls
+ 1925  ls -al
+ 1926  man dpkg
+ 1927  sudo dpkg install ./code_1.53.2-1613044047_armhf.deb
+ 1928  dpkg --help
+ 1929  sudo dpkg -i install ./code_1.53.2-1613044047_armhf.deb
+ 1930  sudo dpkg -i ./code_1.53.2-1613044047_armhf.deb
+ 1931  code
+ 1932  htop
+ 1933  ls
+ 1934  ls -al
+ 1935  tar --help
+ 1936  tar -tvJf arduino-1.8.13-linuxarm.tar.xz 
+ 1937  cd ..
+ 1938  cd /opt
+ 1939  ls
+ 1940  ls -al
+ 1941  sync
+ 1942  chmod 777 .
+ 1943  ls
+ 1944  sudo chmod 777 .
+ 1945  ls -al
+ 1946  tar -xvJf ~/Downloads/arduino-1.8.13-linuxarm.tar.xz 
+ 1947  ls
+ 1948  ls -al
+ 1949  cd arduino-1.8.13/
+ 1950  ls
+ 1951  ls -al
+ 1952  more install.sh 
+ 1953  more arduino-linux-setup.sh 
+ 1954  more install.sh 
+ 1955  ls -al
+ 1956  sudo ./arduino-linux-setup.sh 
+ 1957  ./arduino-linux-setup.sh 
+ 1958  ./arduino-linux-setup.sh pi
+ 1959  ./install.sh 
+ 1960  sudo ./install.sh 
+ 1961  history
+ 1962  lsmod
+ 1963  lsmod | wc
+ 1964  cd
+ 1965  cd pololu-rpi-slave-arduino-library/pi/
+ 1966  ls
+ 1967  ls -al
+ 1968  python3 ./serial_test.py 
+ 1969  vncserver-virtuald --help
+ 1970  vncserver-virtuald -Authentication=None
+ 1971  sudo vncserver-virtuald -Authentication=None
+ 1972  ps -ef
+ 1973  netstat -l -n
+ 1974  vncserver-virtuald
+ 1975  vncserver-virtuald --help
+ 1976  ps -ef | grep vnc
+ 1977  ps -ef | grep -i lx
+ 1978  sudo kill 1062
+ 1979  man vncserver-virtuald
+ 1980  vncserver-virtual --help
+ 1981  vncserver-virtual -list
+ 1982  vncserver-virtual -Authentication=None
+ 1983  vncserver-virtual -list | grep -i geo
+ 1984  vncserver-virtual -list | grep -i col
+ 1985  vncserver-virtual -list | grep -i dep
+ 1986  vncserver-virtual -list | grep -i bit
+ 1987  vncserver-virtual -list | grep -i bits
+ 1988  vncserver-virtual -list | grep -i bit
+ 1989  vncserver-virtual -list 
+ 1990  vncserver-virtual -list | grep -i colr
+ 1991  vncserver-virtual -list | grep -i col
+ 1992  vncserver-virtual -kill :1
+ 1993  vncserver-virtual -Authentication=None -geometry 1920x1080
+ 1994  history | grep raspivid
+ 1995  history
+ 1996  ps -ef | grep X
+ 1997  sync
+ 1998  sudo poweroff
+ 1999  htop
+ 2000  raspivid -n -t 0 -w 640 -h 480 -vf -fps 30 -v -l -o tcp://0.0.0.0:5001
+ 2001  sudo apt install mplayer
+ 2002  raspivid -n -t 0 -w 640 -h 480 -vf -fps 30 -v -l -o tcp://0.0.0.0:5001
+ 2003  cd pololu-rpi-slave-arduino-library/pi/
+ 2004  ./blink.py 
+ 2005  raspivid -n -t 0 -w 640 -h 480 -vf -fps 30 -v -l -o tcp://0.0.0.0:5001
+ 2006  dmesg
+ 2007  raspivid -n -t 0 -w 640 -h 480 -vf -fps 30 -v -l -o tcp://0.0.0.0:5001
+ 2008  raspivid --help
+ 2009* raspivid -n -t 0 -w 640 -h 480 -vf -fps 20 -g 8 -v -l -o tcp://0.0.0.0:5001
+ 2010  raspivid -n -t 0 -w 320 -h 240 -vf -fps 60 -g 8 -v -l -o tcp://0.0.0.0:5001
+ 2011  raspivid -n -t 0 -w 320 -h 240 -vf -fps 20 -g 8 -v -l -o tcp://0.0.0.0:5001
+ 2012  raspivid -n -t 0 -w 320 -h 240 -vf -fps 20 -g 1 -v -l -o tcp://0.0.0.0:5001
+ 2013  raspivid -n -t 0 -w 320 -h 240 -vf -fps 20 -g 2 -v -l -o tcp://0.0.0.0:5001
+ 2014  raspivid --help
+ 2015  raspivid -n -t 0 -w 320 -h 240 -vf -hf -fps 20 -g 2 -v -l -o tcp://0.0.0.0:5001
+ 2016  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 20 -g 2 -v -l -o tcp://0.0.0.0:5001
+ 2017  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 60 -g 2 -v -l -o tcp://0.0.0.0:5001
+ 2018  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o tcp://0.0.0.0:5001
+ 2019  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o udp://0.0.0.0:5001
+ 2020  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o rtmp://0.0.0.0:5001
+ 2021  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o rtsp://0.0.0.0:5001
+ 2022  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o - | nc -l -u -n -v -p 5001
+ 2023  nc -h
+ 2024  nc -l -u -n -v -p 5001
+ 2025  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o - | nc -l -u -n -v -p 5001
+ 2026  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o - | nc -u -l -n -v -p 5001
+ 2027  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -l -o - | nc -l -n -v -p 5001
+ 2028  raspvid --help
+ 2029  raspivid --help
+ 2030  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -o - | nc -u -l -n -v -p 5001
+ 2031  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -o - | nc -l -n -v -p 5001
+ 2032  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -o - | nc -n -v localhost 5001
+ 2033  nc -n -v localhost 5001
+ 2034  nc -n -v 127.0.0.1 5001
+ 2035  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -o - | nc -n -v 127.0.0.1  5001
+ 2036  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 1 -v -o - | nc -n -v -u 127.0.0.1  5001
+ 2037  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 4 -v -o - | nc -n -v -u 127.0.0.1  5001
+ 2038  raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 4 -v -o - | nc -l -n -v -u -p 5001
+ 2039  nc -l -n -v -u -p 5001 | raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 4 -v -o -
+ 2040  man nc
+ 2041  nc -h
+ 2042  nc -l -n -v -u -p 5001 | raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 4 -v -o tcp://0.0.0.0:5001
+ 2043  nc -l -n -v -u -p 5001 | raspivid -n -t 0 -w 428 -h 240 -vf -hf -fps 30 -g 4 -v -l -o tcp://0.0.0.0:5001
+ 2044  history
+ 2045  ls
+ 2046  ls h*
+ 2047  history > h.txt
+ 1983  vncserver-virtual -list | grep -i geo
+ 1984  vncserver-virtual -list | grep -i col
+ 1985  vncserver-virtual -list | grep -i dep
+ 1986  vncserver-virtual -list | grep -i bit
+ 1987  vncserver-virtual -list | grep -i bits
+ 1988  vncserver-virtual -list | grep -i bit
+ 1989  vncserver-virtual -list 
+ 1990  vncserver-virtual -list | grep -i colr
+ 1991  vncserver-virtual -list | grep -i col
+ 1992  vncserver-virtual -kill :1
+ 1993  vncserver-virtual -Authentication=None -geometry 1920x1080
+ 1994  history | grep raspivid
+ 1995  history
+ 1996  ps -ef | grep X
+ 1997  sync
+ 1998  sudo poweroff
+ 1999  htop
+ 2000  which mplayer
+ 2001  mplayer --help
+ 2002  mplayer -fps 300 -demuxer h264es -nocache -nosound -framedrop ffmpeg://tcp://localhost:5001
+ 2003  cd pololu-rpi-slave-arduino-library/pi
+ 2004  ./blink.py 
+ 2005  nc -n -v -u localhost 5001 | mplayer -demuxer h264es
+ 2006  nc -n -v -u localhost 5001 | mplayer -demuxer h264es -
+ 2007  nc -n -v  localhost 5001 | mplayer -demuxer h264es -
+ 2008  telnet localhost 5001
+ 2009  nc -n -v  localhost 5001 | mplayer -demuxer h264es -
+ 2010  nc -n -v -u localhost 5001 | mplayer -demuxer h264es -
+ 2011  nc -n -v  localhost 5001 | mplayer -demuxer h264es -
+ 2012  nc -l -n -v  localhost 5001 | mplayer -demuxer h264es -
+ 2013  nc -l -n -v -p 5001 | mplayer -demuxer h264es -
+ 2014  netstat -l
+ 2015  netstat -l -n
+ 2016  nc -l -n -v -p 5001 
+ 2017  nc -l -n -v -p 5001 | mplayer -demuxer h264es -
+ 2018  nc -l -n -v -p 5001 | mplayer -nocache -framedrop -fps 180 -demuxer h264es -
+ 2019  nc -u -l -n -v -p 5001 | mplayer -nocache -framedrop -fps 180 -demuxer h264es -
+ 2020  mplayer --help
+ 2021  nc -u -l -n -v -p 5001 | mplayer -nocache -framedrop -fps 300  -nosound -demuxer h264es -
+ 2022  nc -u -n -v 127.0.0.1 5001 | mplayer -nocache -framedrop -fps 300  -nosound -demuxer h264es -
+ 2023  nc -u -n -v 127.0.0.1 5001 | mplayer -nocache -framedrop -fps 300  -nosound -demuxer h264es ffmpeg://udp://127.0.0.1:5001
+ 2024  mplayer -nocache -framedrop -fps 300  -nosound -demuxer h264es ffmpeg://udp://127.0.0.1:5001
+ 2025  nc -u -n -v 127.0.0.1 5001 | mplayer -nocache -framedrop -fps 300  -nosound -demuxer h264es -
+ 2026  nc -u -n -v 127.0.0.1 5001 | mplayer -nocache -framedrop -fps 300  -nosound -demuxer h264es ffmpeg://tcp://127.0.0.1:5001
+ 2027  mplayer -nocache -framedrop -fps 300  -nosound -demuxer h264es ffmpeg://tcp://127.0.0.1:5001
+ 2028  history
+ 2029  history -tail 20
+ 2030  history | tail -20
+ 2031  history | tail -50
+ 2032  history | tail -50 >> h.txt 
