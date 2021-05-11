@@ -4,6 +4,17 @@ import re
 import math
 import time
 import serial
+import signal
+
+
+done=False
+
+def signal_handler(sig, frame):
+  global done
+  #print('You pressed Ctrl+C!')
+  #a_star.motors(0, 0);
+  #sys.exit(0)
+  done=True
 
 
 
@@ -125,9 +136,9 @@ def update_heading():
         angle = 360.0 + angle
 
 def test():
-    global angle, th1, dth, dth1_total, dps, dps_max
+    global angle, th1, dth, dth1_total, dps, dps_max, done
     t_print = t = time.monotonic()
-    while True:
+    while done==False:
         update_heading()
         t = time.monotonic()
         if t - t_print > 0.045:
@@ -140,6 +151,9 @@ def test():
 
   
 if __name__ == '__main__':
+  done=False
+  print("installing SIGINT handler")
+  signal.signal(signal.SIGINT, signal_handler)
   initialize()
   test()
   
