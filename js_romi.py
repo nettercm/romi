@@ -88,3 +88,6 @@ while done==0:
     t_last_print = t
 
   time.sleep(0.01)  
+
+  if js.done == True:
+    done = 1

@@ -93,7 +93,7 @@ jsdev = None
 thread_1=None
 
 def js_thread(q,id):
-    global jsdev, axis_map,axis_states,axis_names,button_map,button_names,button_states
+    global jsdev, axis_map,axis_states,axis_names,button_map,button_names,button_states, done
     while not done:
         evbuf = jsdev.read(8)
         if evbuf:
@@ -118,6 +118,9 @@ def js_thread(q,id):
                     fvalue = value / 32767.0
                     axis_states[axis] = fvalue
                     #print("%s: %.3f" % (axis, fvalue))
+
+        if button_states['mode'] == 1:
+            done = True
 
 
 
@@ -190,13 +193,10 @@ def js_deinit():
 
 
 
-js_init()
-
-
-
 if __name__ == '__main__':
+    js_init()
     # Main event loop
-    while True:
+    while not done:
         #print("rx: %f" % (axis_states['rx']))
         print(axis_states,button_states)
         time.sleep(0.1)
