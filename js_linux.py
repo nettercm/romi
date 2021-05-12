@@ -1,6 +1,5 @@
-# Released by rdb under the Unlicense (unlicense.org)
-# Based on information from:
-# https://www.kernel.org/doc/Documentation/input/joystick-api.txt
+#!/usr/bin/env python3
+
 
 import os, struct, array
 from fcntl import ioctl
