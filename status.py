@@ -29,48 +29,10 @@ signal.signal(signal.SIGINT, signal_handler)
 a_star = AStar()
 
 
-#while 1:
-#  a_star.leds(1,0,0)
-#  time.sleep(0.0001)
-#  a_star.leds(0,1,0)
-#  time.sleep(0.0001)
-#  a_star.leds(0,0,1)
-#  time.sleep(0.0001)
-
 ts0 = 0.0
 
 t_print=time.time()
 
-"""
-
-while done==0:
-  t1=time.time()
-  analog = a_star.read_analog()      # 1.2ms
-  encoders = a_star.read_encoders()  # 0.5ms
-  battery_millivolts = a_star.read_battery_millivolts()  # 0.4ms
-  # ~2.2ms for all 3 of the above
-  #a_star.motors(int(0), int(0))
-  t2=time.time()
-  if time.time() - t_print > 0.02:
-    print("%7.5f" % (t2-t1) )
-    t_print = time.time()
-
-"""
-
-
-"""
-a_star.leds(1,1,1)
-t1 = time.monotonic()
-for i in range(0,5000):
-  #a_star.leds(1,1,1)
-  #a_star.leds(0,0,0)
-  encoders = a_star.read_encoders()
-  
-t2 = time.monotonic()
-print("dT/iter=%d  errors=%d" % ( ((t2-t1)/5000)*1000000 , a_star.errors ) )
-a_star.leds(0,0,0)
-sys.exit(0)
-"""
   
   
 while done==0:
