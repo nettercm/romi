@@ -55,9 +55,15 @@ t_print=time.time()
 
 js.js_init()
 
-max_speed = 400
+max_speed = 200
 
 t_last_print = time.monotonic()
+
+commanded_linear_velocity = 0.0
+commanded_angular_velocity = 0.0
+
+target_angular_velocity = 0.0
+target_linear_velocity = 0.0
 
 while done==0:
   a_star.leds(1,1,1)
@@ -69,25 +75,84 @@ while done==0:
   ir_left  = np.interp(analog[3],ir_near_xp,ir_near_fp)*25.4
   ir_front = np.interp(analog[1],ir_far_xp,ir_far_fp)*25.4
   ir_right = np.interp(analog[2],ir_near_xp,ir_near_fp)*25.4
+
+  us_left = analog[0]
+  us_right = analog[4]
+
+  #nearest_obstacle = min(ir_left,ir_right,ir_front,us_left,us_right)
+  nearest_obstacle = min( ir_front, us_left, us_right ,ir_left*1.5, ir_right*1.5 )
+
   t=time.monotonic()
 
-  y = js.axis_states['y']
-  ry = js.axis_states['ry']
+  y = -js.axis_states['y']
+  #ry = js.axis_states['ry']
   rx = js.axis_states['rx']
-  l_speed = y*-max_speed
-  r_speed = l_speed
 
-  l_speed = l_speed + rx*max_speed
-  r_speed = r_speed - rx*max_speed
-  #print(y,rx,l_speed,r_speed)
+  js_linear_velocity = y * max_speed
+  js_angular_velocity = rx * max_speed
+
+  #optionally damping the joysting 
+  #target_angular_velocity = (2*target_angular_velocity + js_angular_velocity) / 3
+  #target_linear_velocity = (5*target_linear_velocity + js_linear_velocity) / 6
+  target_angular_velocity = js_angular_velocity
+  target_linear_velocity = js_linear_velocity
+
+  linear_accelleration = 4
+
+  if nearest_obstacle < 200 and target_linear_velocity > 5:
+    speed_limit = nearest_obstacle / 2
+    if target_linear_velocity > speed_limit:  
+      target_linear_velocity = speed_limit
+      linear_accelleration = 6
+  
+  if commanded_angular_velocity < target_angular_velocity: commanded_angular_velocity = commanded_angular_velocity + 8
+  if commanded_angular_velocity > target_angular_velocity: commanded_angular_velocity = commanded_angular_velocity - 8
+
+  if commanded_linear_velocity < target_linear_velocity: commanded_linear_velocity = commanded_linear_velocity + linear_accelleration
+  if commanded_linear_velocity > target_linear_velocity: commanded_linear_velocity = commanded_linear_velocity - linear_accelleration
+
+  '''
+  if ir_left<300 or ir_right<300 or ir_front<300 or us_left<300 or us_right<300:
+    if y < 0:
+      y = 0.0
+    print("T=%8.4f    %-4.2f  %-4.2f   ir(adc)= %4d,  %4d,  %4d   ir = %5.0f,  %5.0f,  %5.0f   us= %4d,  %4d      %2.1f V      e=%6d,%6d    errors=%d" % (t, js.axis_states['y'],js.axis_states['rx'],    analog[3]/1,  analog[1]/1,  analog[2]/1,   ir_left, ir_front, ir_right,  analog[0]/1,  analog[4]/1,float(battery_millivolts[0])/1000.0, encoders[0], encoders[1], a_star.errors) )  
+  '''
+
+  '''
+  if y < 0:  #going forward?
+    max_speed = (max_speed + nearest_obstacle/2) / 2
+  else:
+    max_speed = 200
+
+  if max_speed > 200:
+    max_speed = 200
+  '''
+
+  l_speed = commanded_linear_velocity
+  r_speed = commanded_linear_velocity
+
+  l_speed = l_speed + commanded_angular_velocity
+  r_speed = r_speed - commanded_angular_velocity
+
+  l_speed = l_speed * 0.92
+
+  if l_speed > max_speed:  l_speed = max_speed
+
+  if r_speed > max_speed:  r_speed = max_speed
+
   a_star.motors(int(l_speed), int(r_speed))
 
+  
   if t > t_last_print + 0.1:
-    print("T=%8.4f    %-4.2f  %-4.2f   ir(adc)= %4d,  %4d,  %4d   ir = %5.0f,  %5.0f,  %5.0f   us= %4d,  %4d      %2.1f V      e=%6d,%6d    errors=%d" % (t, js.axis_states['y'],js.axis_states['rx'],    analog[3]/1,  analog[1]/1,  analog[2]/1,   ir_left, ir_front, ir_right,  analog[0]/1,  analog[4]/1,float(battery_millivolts[0])/1000.0, encoders[0], encoders[1], a_star.errors) )  
+    #print("T=%8.4f    %-4.2f  %-4.2f   ir(adc)= %4d,  %4d,  %4d   ir = %5.0f,  %5.0f,  %5.0f   us= %4d,  %4d      %2.1f V      e=%6d,%6d    errors=%d" % (t, js.axis_states['y'],js.axis_states['rx'],    analog[3]/1,  analog[1]/1,  analog[2]/1,   ir_left, ir_front, ir_right,  analog[0]/1,  analog[4]/1,float(battery_millivolts[0])/1000.0, encoders[0], encoders[1], a_star.errors) )  
     #print("%-4.2f  %-4.2f" % (js.axis_states['y'],js.axis_states['ry']) )
+    print("%-6.1f, %-6.1f, %-6.1f, %-6.1f   ir = %5.0f,  %5.0f,  %5.0f   us= %4d,  %4d  " % (js_linear_velocity, commanded_linear_velocity, commanded_angular_velocity, nearest_obstacle, ir_left,ir_front, ir_right, us_left, us_right) )
     t_last_print = t
-
+  
   time.sleep(0.01)  
 
   if js.done == True:
     done = 1
+
+
+a_star.motors(0,0)
