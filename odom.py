@@ -4,14 +4,13 @@
 
 print("doing imports...this could take a few seconds!")
 
-from p2_i2c_test import AStar
+from i2c_testing.p2_i2c_test import AStar
 import time
 import signal
 import sys
 import threading
 import math
 from math import cos,sin,pi
-from pynput import keyboard
 import termios
 import fcntl
 import os
@@ -53,7 +52,10 @@ r_cmd = 0;
 
 speed_increment = 2;
 
+'''
 #######################################################################
+
+from pynput import keyboard
 
 def on_press(key):
   global l_cmd,r_cmd,l_target,r_target,speed_increment;
@@ -87,6 +89,13 @@ def on_release(key):
     return True
 
 #######################################################################
+
+print("starting keyboard listener")
+listener = keyboard.Listener( on_press=on_press, on_release=on_release )
+listener.start()
+
+
+'''
 
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
@@ -200,10 +209,6 @@ t2.start();
 
 
 """
-
-print("starting keyboard listener")
-listener = keyboard.Listener( on_press=on_press, on_release=on_release )
-listener.start()
 
 
 
