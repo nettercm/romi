@@ -16,7 +16,7 @@ except:
   print("unable to import pynput")
   
   
-a_start = None
+a_star = None
 
 PI=3.1415926535897932384626433832795;
 K_rad_to_deg=(180.0/3.1415926535897932384626433832795);
@@ -70,7 +70,7 @@ initialized2 = 0
 
 #######################################################################
 
-def on_press(key):
+def on_press_callback(key):
   global l_cmd,r_cmd,l_target,r_target,speed_increment;
   print('You pressed a key')
   if key == keyboard.Key.up:
@@ -94,7 +94,7 @@ def on_press(key):
     
 #######################################################################
     
-def on_release(key):
+def on_release_callback(key):
     print('You released a key')
     if key == keyboard.Key.esc:
       print('You pressed Esc')
@@ -353,7 +353,7 @@ if __name__ == '__main__':
   signal.signal(signal.SIGINT, signal_handler)
   
   print("starting keyboard listener")
-  listener = keyboard.Listener( on_press=on_press, on_release=on_release )
+  listener = keyboard.Listener( on_press=on_press_callback, on_release=on_release_callback )
   listener.start()
 
   a_star = AStar()
