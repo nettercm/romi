@@ -7,7 +7,7 @@ import time
 import threading, queue
 import signal
 import sys
-
+import select
 
 # We'll store the states here.
 axis_states = {}
@@ -90,6 +90,7 @@ button_names = {
 axis_map = []
 button_map = []
 jsdev = None
+jsdev_os = None
 thread_1=None
 
 def js_thread(q,id):
@@ -123,10 +124,45 @@ def js_thread(q,id):
             done = True
 
 
+def js_thread_v2(q,id):
+    global jsdev_os, axis_map,axis_states,axis_names,button_map,button_names,button_states, done
+    while not done:
+        evbuf=None
+        s = select.select([jsdev_os],[],[],0.1)
+        if len(s[0]) > 0:
+            evbuf = os.read(jsdev_os,8)
+
+        if evbuf:
+            t, value, type, number = struct.unpack('IhBB', evbuf)
+            #print(struct.unpack('IhBB', evbuf))
+
+            #if type & 0x80:
+                #print("(initial)", end="")
+
+            if type & 0x01:
+                button = button_map[number]
+                if button:
+                    button_states[button] = value
+                    #if value:
+                        #print("%s pressed" % (button))
+                    #else:
+                        #print("%s released" % (button))
+
+            if type & 0x02:
+                axis = axis_map[number]
+                if axis:
+                    fvalue = value / 32767.0
+                    axis_states[axis] = fvalue
+                    #print("%s: %.3f" % (axis, fvalue))
+
+        if button_states['mode'] == 1:
+            done = True
+
 
 def js_init():
     global fn
     global jsdev
+    global jsdev_os
     global thread_1
     # Iterate over the joystick devices.
     print('Available devices:')
@@ -140,6 +176,7 @@ def js_init():
 
     print('Opening %s...' % fn)
     jsdev = open(fn, 'rb')
+    jsdev_os = os.open('/dev/input/js0',os.O_RDONLY|os.O_NONBLOCK)
 
     # Get the device name.
     #buf = bytearray(63)
@@ -178,7 +215,7 @@ def js_init():
     print('%d axes found: %s' % (num_axes, ', '.join(axis_map)))
     print('%d buttons found: %s' % (num_buttons, ', '.join(button_map)))
 
-    thread_1 = threading.Thread(target=js_thread, args=(0,1))
+    thread_1 = threading.Thread(target=js_thread_v2, args=(0,1))
     thread_1.start()
 
 
@@ -186,9 +223,11 @@ def js_init():
 def js_deinit():
     global thread_1
     global jsdev
+    global jsdev_os
     global done
     done = True
     jsdev.close()
+    os.close(jsdev_os)
     thread_1.join()
 
 
@@ -199,4 +238,4 @@ if __name__ == '__main__':
     while not done:
         #print("rx: %f" % (axis_states['rx']))
         print(axis_states,button_states)
-        time.sleep(0.1)
+        time.sleep(0.2)
