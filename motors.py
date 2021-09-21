@@ -88,28 +88,35 @@ def test2():
   rm_cmd = 0
   lm_cmd = 0
 
+  next_update_time = time.monotonic() + update_interval
+
   while not done:
   
+    if time.monotonic() >= next_update_time:   #- t_romi_update > update_interval:
+      #t_romi_update = time.monotonic()
+      next_update_time += update_interval
 
-    bat = float(a_star.read_battery_millivolts()[0])
-    if a_star.error:
       bat = float(a_star.read_battery_millivolts()[0])
+      if a_star.error:
+        bat = float(a_star.read_battery_millivolts()[0])
 
-    b[i] = bat
-    bat = (b[0]+b[1]+b[2]+b[3]+b[4]+b[5]+b[6]+b[7])/8
-    i += 1
-    if i > 7: i = 0
+      b[i] = bat
+      bat = (b[0]+b[1]+b[2]+b[3]+b[4]+b[5]+b[6]+b[7])/8
+      i += 1
+      if i > 7: i = 0
 
-
-  
-    if time.monotonic() - t_romi_update > update_interval:
-      t_romi_update = time.monotonic()
       e = a_star.read_encoders()
+      if a_star.error:
+        e = a_star.read_encoders()
       dl,dr = o.odometry_update(e[0],e[1])
       if dr < rm: rm_cmd +=2
       if dr > rm: rm_cmd -=2
       if dl < lm: lm_cmd +=2
       if dl > lm: lm_cmd -=2
+      if lm_cmd > 400:  lm_cmd = 400
+      if lm_cmd < -400: lm_cmd = -400
+      if rm_cmd > 400:  rm_cmd = 400
+      if rm_cmd < -400: rm_cmd = -400
       a_star.motors(lm_cmd,rm_cmd)
       lm_cmd_array[j] = lm_cmd
       rm_cmd_array[j] = rm_cmd
@@ -117,14 +124,17 @@ def test2():
       dr_array[j] = dr
       j += 1
       if j > 7: j = 0
+      if True: #time.monotonic() - t_print > 0.05:
+        t_print = time.monotonic()
+        lm_cmd_avg = (lm_cmd_array[0]+lm_cmd_array[1]+lm_cmd_array[2]+lm_cmd_array[3]+lm_cmd_array[4]+lm_cmd_array[5]+lm_cmd_array[6]+lm_cmd_array[7])/8.0
+        rm_cmd_avg = (rm_cmd_array[0]+rm_cmd_array[1]+rm_cmd_array[2]+rm_cmd_array[3]+rm_cmd_array[4]+rm_cmd_array[5]+rm_cmd_array[6]+rm_cmd_array[7])/8.0
+        dl_avg = (dl_array[0]+dl_array[1]+dl_array[2]+dl_array[3]+dl_array[4]+dl_array[5]+dl_array[6]+dl_array[7])/8.0
+        dr_avg = (dr_array[0]+dr_array[1]+dr_array[2]+dr_array[3]+dr_array[4]+dr_array[5]+dr_array[6]+dr_array[7])/8.0
+        print("%9.3f, %4d, %4d, %4d, %4d, %5.1f, %5.1f, %4d, %4d, %5.1f, %5.1f, %6d, %6d, %7.1f, %2d"  % (t_print, lm, rm, lm_cmd, rm_cmd, lm_cmd_avg, rm_cmd_avg, dl, dr, dl_avg, dr_avg, e[0], e[1], bat, a_star.errors))
 
-    if time.monotonic() - t_print > 0.05:
-      t_print = time.monotonic()
-      lm_cmd_avg = (lm_cmd_array[0]+lm_cmd_array[1]+lm_cmd_array[2]+lm_cmd_array[3]+lm_cmd_array[4]+lm_cmd_array[5]+lm_cmd_array[6]+lm_cmd_array[7])/8.0
-      rm_cmd_avg = (rm_cmd_array[0]+rm_cmd_array[1]+rm_cmd_array[2]+rm_cmd_array[3]+rm_cmd_array[4]+rm_cmd_array[5]+rm_cmd_array[6]+rm_cmd_array[7])/8.0
-      dl_avg = (dl_array[0]+dl_array[1]+dl_array[2]+dl_array[3]+dl_array[4]+dl_array[5]+dl_array[6]+dl_array[7])/8.0
-      dr_avg = (dr_array[0]+dr_array[1]+dr_array[2]+dr_array[3]+dr_array[4]+dr_array[5]+dr_array[6]+dr_array[7])/8.0
-      print("%9.3f, %4d, %4d, %4d, %4d, %5.1f, %5.1f, %4d, %4d, %5.1f, %5.1f, %6d, %6d, %7.1f, %2d"  % (t_print, lm, rm, lm_cmd, rm_cmd, lm_cmd_avg, rm_cmd_avg, dl, dr, dl_avg, dr_avg, e[0], e[1], bat, a_star.errors))
+    sleep_time = (next_update_time - time.monotonic()) - 0.0005
+    if sleep_time < 0: sleep_time = 0
+    time.sleep(sleep_time)
 
   done = False
 
@@ -132,6 +142,8 @@ def test2():
     if time.monotonic() - t_romi_update > update_interval:
       t_romi_update = time.monotonic()
       e = a_star.read_encoders()
+      if a_star.error:
+        e = a_star.read_encoders()
       dl,dr = o.odometry_update(e[0],e[1])
       if dr < 0: rm_cmd +=5
       if dr > 0: rm_cmd -=5
@@ -141,9 +153,9 @@ def test2():
       if abs(dl) < 5: lm_cmd = 0
       a_star.motors(lm_cmd,rm_cmd)
       if (lm_cmd==0) and (rm_cmd==0): done = True
-    if time.monotonic() - t_print > 0.05:
-      t_print = time.monotonic()
-      print("%9.3f, %4d, %4d, %4d, %4d, %5.1f, %5.1f, %4d, %4d, %5.1f, %5.1f, %6d, %6d, %7.1f, %2d"  % (t_print, lm, rm, lm_cmd, rm_cmd, lm_cmd_avg, rm_cmd_avg, dl, dr, dl_avg, dr_avg, e[0], e[1], bat, a_star.errors))
+      if True: #time.monotonic() - t_print > 0.05:
+        t_print = time.monotonic()
+        print("%9.3f, %4d, %4d, %4d, %4d, %5.1f, %5.1f, %4d, %4d, %5.1f, %5.1f, %6d, %6d, %7.1f, %2d"  % (t_print, lm, rm, lm_cmd, rm_cmd, lm_cmd_avg, rm_cmd_avg, dl, dr, dl_avg, dr_avg, e[0], e[1], bat, a_star.errors))
 
 
 if __name__ == '__main__':
@@ -153,7 +165,12 @@ if __name__ == '__main__':
   signal.signal(signal.SIGINT, signal_handler)
 
   print(sys.argv)
-  args = sys.argv[1]+" "+sys.argv[2]+" "+sys.argv[3]+" "+sys.argv[4]
+
+  if len(sys.argv) == 1:
+    args = "10 -10 100 100"
+  else:
+    args = sys.argv[1]+" "+sys.argv[2]+" "+sys.argv[3]+" "+sys.argv[4]
+
   print(args)
   
   scanf_result = scanf('%d %d %f %d',args)
