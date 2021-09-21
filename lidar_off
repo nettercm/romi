@@ -1,0 +1,2 @@
+#!/bin/bash
+gpio -g pwm 12 0

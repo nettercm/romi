@@ -1,0 +1,3 @@
+#!/bin/bash
+echo $1
+gpio -g pwm 12 $1
