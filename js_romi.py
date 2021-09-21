@@ -61,7 +61,7 @@ t_print = time.time()
 
 js.js_init()
 
-max_speed = 400
+max_speed = 100
 
 t_last_print = time.monotonic()
 
@@ -76,7 +76,7 @@ nearest_front_obstacle = 0.0
 avoidance_angular_velocity = 60
 
 last_encoders = a_star.read_encoders()
-
+if a_star.error: last_encoders = a_star.read_encoders()
 
 measured_l_speed_history = [0,0,0,0]
 measured_r_speed_history = [0,0,0,0]
@@ -87,13 +87,19 @@ r_speed_adjust = 0
 
 while done == 0:
 
+    t_update = time.monotonic()
     flags = "-"
     turning = False 
 
     # get all the required inputs from the romi controller
     analog = a_star.read_analog()
+    if a_star.error: analog = a_star.read_analog()
+    
     battery_millivolts = a_star.read_battery_millivolts()[0]
+    if a_star.error: battery_millivolts = a_star.read_battery_millivolts()[0]
+    
     encoders = a_star.read_encoders()
+    if a_star.error: encoders = a_star.read_encoders()
 
     measured_l_speed = encoders[0] - last_encoders[0]
     measured_r_speed = encoders[1] - last_encoders[1]
@@ -144,7 +150,7 @@ while done == 0:
         target_linear_velocity = js_linear_velocity
 
     # set the accelleartion (and decelleration) to the default value - might get adjusted by the logic that comes below
-    linear_accelleration = 10 #TODO: distinguish between accelleration and decelleartion
+    linear_accelleration = 5 #TODO: distinguish between accelleration and decelleartion
 
     
     # the faster we go, the stronger we need to steer
@@ -238,8 +244,8 @@ while done == 0:
     
 
     # ramp up or down to our target angular velocity, using a small deadband of +/- 6 
-    if commanded_angular_velocity < target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity + 10
-    if commanded_angular_velocity > target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity - 10
+    if commanded_angular_velocity < target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity + 2
+    if commanded_angular_velocity > target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity - 2
     if abs( commanded_angular_velocity - target_angular_velocity ) < 6:   commanded_angular_velocity = target_angular_velocity
 
 
@@ -281,6 +287,7 @@ while done == 0:
 
     # send the low-level motor command to the romi controller
     a_star.motors(int(l_speed), int(r_speed))
+    if a_star.error: a_star.motors(int(l_speed), int(r_speed))
 
     # once in a while, but not too often, show what's going on
     if t > t_last_print + 0:  #0.05:
@@ -304,7 +311,11 @@ while done == 0:
         t_last_print = t
 
     # run the loop at approximately 100Hz
-    time.sleep(0.01-0.003)
+    t_now = time.monotonic()
+    t_sleep = (t_update + 0.01) - t_now
+    t_sleep = t_sleep - 0.00004
+    if t_sleep > 0:
+        time.sleep(t_sleep)
 
     if js.done == True:
         done = 1
