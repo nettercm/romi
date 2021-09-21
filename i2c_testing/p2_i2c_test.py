@@ -25,7 +25,7 @@ class AStar(object):
     try:
       self.bus.write_byte(20, address)
     except:
-      print ("Error 1")
+      #print ("Error 1")
       self.errors+=1
       self.error=1
 
@@ -33,7 +33,7 @@ class AStar(object):
     try:
       byte_list = [self.bus.read_byte(20) for _ in range(size)]
     except:
-      print ("Error 2")
+      #print ("Error 2")
       byte_list = [0]
       self.errors+=1
       self.error=1
@@ -49,7 +49,7 @@ class AStar(object):
       #print(data_array);
       self.bus.write_i2c_block_data(20, address, data_array)
     except:
-      print ("Error 3")
+      #print ("Error 3")
       self.errors+=1
       self.error=1
 
@@ -61,7 +61,7 @@ class AStar(object):
     try:
       self.bus.write_i2c_block_data(20, 0, [red,yellow,green])
     except:
-      print ("leds(): Error 3")
+      #print ("leds(): Error 3")
       self.errors+=1
       self.error=1
 
@@ -78,7 +78,7 @@ class AStar(object):
     try:
       self.bus.write_i2c_block_data(20, 6, data)
     except:
-      print ("motors(): Error 3")
+      #print ("motors(): Error 3")
       self.errors+=1
       self.error=1
     return
@@ -89,7 +89,7 @@ class AStar(object):
     try:
       self.bus.write_byte(20, 3)
     except:
-      print ("read_buttons(): Error 1")
+      #print ("read_buttons(): Error 1")
       self.errors+=1
       self.error=1
       return [0,0,0]
@@ -97,7 +97,7 @@ class AStar(object):
     try:
       byte_list = [self.bus.read_byte(20) for _ in range(3)]
     except:
-      print ("read_buttons(): Error 2")
+      #print ("read_buttons(): Error 2")
       byte_list = [0]
       self.errors+=1
       self.error=1
@@ -111,7 +111,7 @@ class AStar(object):
     try:
       self.bus.write_byte(20, 10)
     except:
-      print ("read_battery_millivolts(): Error 1")
+      #print ("read_battery_millivolts(): Error 1")
       self.errors+=1
       self.error=1
       return 0
@@ -119,7 +119,7 @@ class AStar(object):
     try:
       b = [self.bus.read_byte(20) for _ in range(2)]
     except:
-      print ("read_battery_millivolts(): Error 2")
+      #print ("read_battery_millivolts(): Error 2")
       self.errors+=1
       self.error=1
       return 0
@@ -132,7 +132,7 @@ class AStar(object):
     try:
       self.bus.write_byte(20, 12)
     except:
-      print ("read_analog(): Error 1")
+      #print ("read_analog(): Error 1")
       self.errors+=1
       self.error=1
       return [0,0,0,0,0,0]
@@ -140,7 +140,7 @@ class AStar(object):
     try:
       b = [self.bus.read_byte(20) for _ in range(12)]
     except:
-      print ("read_analog(): Error 2")
+      #print ("read_analog(): Error 2")
       self.errors+=1
       self.error=1
       return [0,0,0,0,0,0]
@@ -153,7 +153,7 @@ class AStar(object):
     try:
       self.bus.write_byte(20, 39)
     except:
-      print ("read_encoders(): Error 1")
+      #print ("read_encoders(): Error 1")
       self.errors+=1
       self.error=1
       return [0,0]
@@ -161,7 +161,7 @@ class AStar(object):
     try:
       b = [self.bus.read_byte(20) for _ in range(4)]
     except:
-      print ("read_encoders(): Error 2")
+      #print ("read_encoders(): Error 2")
       self.errors+=1
       self.error=1
       return [0,0]

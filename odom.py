@@ -296,6 +296,15 @@ r = rospy.Rate(100)
 
 counter = 0
 battery = int( a_star.read_battery_millivolts() )
+b = battery 
+
+left_ticks,right_ticks = a_star.read_encoders()
+if a_star.error:
+  left_ticks,right_ticks = a_star.read_encoders()
+  if a_star.error:
+    print("read_encoders(): double error")
+last_left_ticks = left_ticks
+last_right_ticks = right_ticks
 
 while not rospy.is_shutdown():
     current_time = rospy.Time.now()
@@ -304,7 +313,12 @@ while not rospy.is_shutdown():
     #started with chrt -f 60
     #if current_time - last_time > rospy.Duration(0.0105):
     #  print(current_time,last_time,current_time-last_time)
-    left_ticks,right_ticks = a_star.read_encoders();
+    left_ticks,right_ticks = a_star.read_encoders()
+    if a_star.error:
+      left_ticks,right_ticks = a_star.read_encoders()
+      if a_star.error:
+        print("read_encoders(): double error")
+
     delta_L = left_ticks - last_left_ticks
     delta_R = right_ticks - last_right_ticks
 
@@ -317,8 +331,14 @@ while not rospy.is_shutdown():
     if delta_R < -32000:
       delta_R = 65536 + delta_R;
 
-    last_left_ticks = left_ticks
-    last_right_ticks = right_ticks
+    #ignore faulty readings
+    if abs(delta_L > 200) or abs(delta_R > 200):
+      delta_L = 0
+      delta_R = 0
+    else:
+      last_left_ticks = left_ticks
+      last_right_ticks = right_ticks
+    
     last_time = current_time
 
     #make sure that we always start at 0,0 when this node is restarted
@@ -408,10 +428,12 @@ while not rospy.is_shutdown():
       time.sleep(0.0005)
       b = a_star.read_battery_millivolts()
       if b > 0:
-        print("b=%5d, l_cmd=%4d, r_cmd=%4d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.1f y=%7.1f th=%8.3f" % (int(b),l_cmd,r_cmd,delta_L,delta_R,l_target,r_target,x,y,degs(norm(th))))
+        #print("b=%5d, l_cmd=%4d, r_cmd=%4d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.1f y=%7.1f th=%8.3f" % (int(b),l_cmd,r_cmd,delta_L,delta_R,l_target,r_target,x,y,degs(norm(th))))
         battery = (battery * 3 + b) / 4
         i = Int32()
         i.data = int(b)
         battery_pub.publish(i)
       
+    print("b=%5d, l_cmd=%4d, r_cmd=%4d, left_t=%6d, right_t=%6d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.1f y=%7.1f th=%8.3f" % (int(b),l_cmd,r_cmd,left_ticks,right_ticks,delta_L,delta_R,l_target,r_target,x,y,degs(norm(th))))
+  
     r.sleep()
