@@ -252,9 +252,9 @@ def cmd_vel_callback(msg):
     #l_cmd = int((msg.linear.x - msg.angular.z) * 100)
     #r_cmd = int((msg.linear.x + msg.angular.z) * 100)
     l_target = int((msg.linear.x - msg.angular.z) * 100)
-    l_cmd = l_target
+    #l_cmd = l_target
     r_target = int((msg.linear.x + msg.angular.z) * 100)
-    r_cmd = r_target
+    #r_cmd = r_target
     #print(l_cmd,r_cmd)
     
    
@@ -332,14 +332,18 @@ while not rospy.is_shutdown():
       delta_R = 65536 + delta_R;
 
     #ignore faulty readings
-    if abs(delta_L > 200) or abs(delta_R > 200):
+    
+    if abs(delta_L) > 200 or abs(delta_R) > 200:
       delta_L = 0
       delta_R = 0
+      #print(delta_L,delta_R)
     else:
       last_left_ticks = left_ticks
       last_right_ticks = right_ticks
     
     last_time = current_time
+    #last_left_ticks = left_ticks
+    #last_right_ticks = right_ticks
 
     #make sure that we always start at 0,0 when this node is restarted
     #at least during testing, that makes sense
@@ -418,6 +422,12 @@ while not rospy.is_shutdown():
       r_cmd -= 1;
     if delta_R < r_target:
       r_cmd += 1;
+
+    if l_target == 0 and abs(delta_L) < 2:
+      l_cmd = 0
+
+    if r_target == 0 and abs(delta_R) < 2:
+      r_cmd = 0
 
     a_star.motors(l_cmd, r_cmd)
     #print(l_cmd,r_cmd)
