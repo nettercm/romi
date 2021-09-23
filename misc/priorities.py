@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import psutil 
 import os
 import time
@@ -49,7 +50,7 @@ while True:
 kthreadd = psutil.Process(pid=2)
 
 while True:
-    time.sleep(0.5)
+    time.sleep(5.0)
     # Iterate over all running process
     for proc in kthreadd.children():
         try:
