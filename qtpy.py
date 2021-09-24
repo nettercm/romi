@@ -19,20 +19,32 @@ def signal_handler(sig, frame):
 
 
 sign = lambda x: math.copysign(1, x)
-th1 = 0.0
-th2 = 0.0
-dth_total = 0.0
-dth1_total = 0.0
-dth_original = 0.0
-dth = 0.0
+
+heading_uncal_old = 0.0
+heading_uncal_new = 0.0
+
+heading_delta_uncal_accumulated = 0.0
+heading_delta_calib_accumulated = 0.0
+
+heading_delta_uncal = 0.0
+heading_delta_calib = 0.0
+
+heading_calib = 0.0
+
+#the absolute heading returned from the BNO085 tends to "drift" by about 1.2 ... 2.0 degrees for every 360 degrees of rotation
+#in other words, if the BNO tells us we have turned by 10.00 degrees, we have acutall turned by 10.00*1.004 =~ 10.04 degrees
+#it does not "drift" when stationary
+calibration_constant = 1.0042 #1.0034 #1.0047 #1.00551 #1.0055 #1.00556 #1.0055556
+noise_floor = 0.01
+
 dps = 0.0
 dps_max = 0.0
 done = False
 t_print = 0.0
 f = None
-angle = 0.0
-angle_raw = 0.0
 qtpy_timestamp = 0
+
+
 
 def between(x_min,x,x_max):
   if (x >= x_min) and (x <= x_max):
@@ -57,7 +69,7 @@ def th_delta(th_old, th_new):
 
 
 def initialize():
-    global f, th1, th2
+    global f, th1, heading_uncal_old
     f = serial.Serial('/dev/ttyACM0',1000000) #baud rate value does not matter actually
     f.flushInput()
     f.flushInput()
@@ -67,15 +79,63 @@ def initialize():
 
     print("### start of data stream found ###")
 
-    th2 = r[1]
-    th1 = th2
+    heading_uncal_old = r[1]
+    th1 = heading_uncal_old
     angle = 0.0
 
-    f.timeout = 0.009
+    f.timeout = 0.011
    
 
+
+
+def get_reading():
+    r = None
+    try:
+        b = f.read(50)  #total size is actually 52, so let's read at least 50
+        if len(b) > 0:
+            while b[len(b)-1] != 10:  #if the read returned before we got the \r\n, then just do another read
+                b = b + f.read(1)
+            l = b.decode("utf-8")
+            #l = f.readline().decode("utf-8")
+            r = scanf('%d,%f,%d,%d,%d,%d,%d,%d,%d,%d',l)
+            if len(r) != 10:
+                r = None 
+    except:
+      print("something went wrong! ")
+      r = None
+      #f.flushInput()
+    
+    return r
+
+
+
+
+def update_heading_v2():
+    global qtpy_timestamp, heading_calib , heading_uncal_new, heading_delta_uncal, heading_delta_uncal_accumulated ,heading_delta_calib, heading_delta_calib_accumulated, th1, heading_uncal_old
+      
+    if abs(heading_delta_uncal) < noise_floor:
+        heading_delta_uncal = 0.0
+        
+    heading_delta_uncal_accumulated += heading_delta_uncal
+
+    heading_delta_calib = heading_delta_uncal * calibration_constant
+
+    heading_delta_calib_accumulated += heading_delta_calib
+
+    heading_calib = heading_calib + heading_delta_calib
+
+    if heading_calib > 180.0:
+        heading_calib = -(360.0 - heading_calib)
+    if heading_calib < -180.0:
+        heading_calib = 360.0 + heading_calib
+        
+    return True
+
+
+
+
 def update_heading():
-    global qtpy_timestamp, angle , angle_raw, dth_original, dth_total ,dth, dth1_total, th1, th2
+    global qtpy_timestamp, heading_calib , heading_uncal_new, heading_delta_uncal, heading_delta_uncal_accumulated ,heading_delta_calib, heading_delta_calib_accumulated, th1, heading_uncal_old
     try:
         b = f.read(50)  #total size is actually 52, so let's read at least 50
         if len(b) > 0:
@@ -85,41 +145,86 @@ def update_heading():
         #l = f.readline().decode("utf-8")
         r = scanf('%d,%f,%d,%d,%d,%d,%d,%d,%d,%d',l)
         qtpy_timestamp = r[0]
-        angle_raw = r[1]
-        dth_original = th_delta(th2,angle_raw)
+        heading_uncal_new = r[1]
+        heading_delta_uncal = th_delta(heading_uncal_old,heading_uncal_new)
     except:
       #print("something went wrong! ")
       #f.flushInput()
-      dth_original = 0.0
-      r = [0,th2,0,0]
+      heading_delta_uncal = 0.0
+      r = [0,heading_uncal_old,0,0]
       return False
       
-    #if abs(dth_original) < 0.03:
-    #    dth_original = 0.0
+    #if abs(heading_delta_uncal) < 0.03:
+    #    heading_delta_uncal = 0.0
         
-    dth_total += dth_original
-    dth = dth_original * 1.0042 #1.0034 #1.0047 #1.00551 #1.0055 #1.00556 #1.0055556
-    dth1_total += dth
-    th1 = th1 + dth
-    if th1 > 180.0:
-        th1 = -(360.0 - th1)
-    if th1 < -180.0:
-        th1 = 360.0 + th1
-    th2 = r[1]
+    heading_delta_uncal_accumulated += heading_delta_uncal
+    heading_delta_calib = heading_delta_uncal * 1.0042 #1.0034 #1.0047 #1.00551 #1.0055 #1.00556 #1.0055556
+    heading_delta_calib_accumulated += heading_delta_calib
+
+    heading_uncal_old = heading_uncal_new #r[1]
 
     #th1 is the current heading - after correction
 
     #angle = th1
-    angle = angle + dth
-    if angle > 180.0:
-        angle = -(360.0 - angle)
-    if angle < -180.0:
-        angle = 360.0 + angle
+    heading_calib = heading_calib + heading_delta_calib
+    if heading_calib > 180.0:
+        heading_calib = -(360.0 - heading_calib)
+    if heading_calib < -180.0:
+        heading_calib = 360.0 + heading_calib
         
     return True
 
+
+
+
+
+def test_v2():
+
+    global qtpy_timestamp, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, th1, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
+
+    dth1_total_previous = 0.0
+
+    t_print = t = t_last = time.monotonic()
+
+    while done==False:
+        data = get_reading()
+
+        if data != None:
+            #print(data)
+            f.write(b'\x1b') #tell the qtpy that we are still here....
+            qtpy_timestamp = data[0]
+
+            heading_uncal_new = data[1]
+            heading_delta_uncal = th_delta( heading_uncal_old , heading_uncal_new )
+            heading_uncal_old = heading_uncal_new
+           
+            update_heading_v2()
+
+            t = time.monotonic()
+
+            #check for issues associated with timely reading of the data
+            flag = " "
+            if t - t_last > 0.014:
+                flag = "timing!"
+            if t - t_last < 0.006:
+                flag = "timing!"
+            t_last = t
+
+            dps = (4.0*dps + abs(heading_delta_calib * 100)) / 5.0
+            if dps > dps_max: dps_max = dps
+
+            #if False:
+            #if True:
+            if t - t_print > 0.0:  #print at 5Hz instead of the full 100Hz
+                print("%8d, %7.3f, %8.4f, %8.4f, %11.2f, dps=%6.2f %s" % (qtpy_timestamp, t, heading_calib, heading_uncal_new, heading_delta_calib_accumulated, dps, flag))
+                t_print = t
+
+  
+
+
+
 def test():
-    global angle, angle_raw, th1, dth, dth1_total, dps, dps_max, done
+    global heading_calib, heading_uncal_new, th1, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
     dth1_total_previous = 0.0
     t_print = t = time.monotonic()
     while done==False:
@@ -127,27 +232,31 @@ def test():
             t = time.monotonic()
             if True: #t - t_print > 0.049:
                 f.write(b'\x1b') #tell the qtpy that we are still here....
-                dps = (dps + abs(dth * 100)) / 2.0
+                dps = (dps + abs(heading_delta_calib * 100)) / 2.0
                 if dps > dps_max: dps_max = dps
                 #print("%7.3f, %8.4f, %8.2f, %8.4f, %8.5f, %8.4f, dps=%6.3f,%6.3f" % (t,
-                #th1, dth1_total, dth, dth_original, dth_total, dps, dps_max))
-                dps = 100*(dth1_total - dth1_total_previous)
+                #th1, dth1_total, dth, heading_delta_uncal, dth_total, dps, dps_max))
+                dps = 100*(heading_delta_calib_accumulated - dth1_total_previous)
                 flag = " "
                 if t - t_print > 0.014:
                     flag = "timing!"
                 if t - t_print < 0.006:
                     flag = "duplicate?"
-                print("%8d, %7.3f, %8.4f, %8.4f, %11.2f, dps=%6.2f %s" % (qtpy_timestamp, t, angle, angle_raw, dth1_total, dps, flag))
-                dth1_total_previous = dth1_total
+                print("%8d, %7.3f, %8.4f, %8.4f, %11.2f, dps=%6.2f %s" % (qtpy_timestamp, t, heading_calib, heading_uncal_new, heading_delta_calib_accumulated, dps, flag))
+                dth1_total_previous = heading_delta_calib_accumulated
                 t_print = t
 
   
 if __name__ == '__main__':
-  done=False
-  print("installing SIGINT handler")
-  signal.signal(signal.SIGINT, signal_handler)
-  initialize()
-  test()
+    print(__file__,__name__)
+    done=False
+    print("installing SIGINT handler")
+    signal.signal(signal.SIGINT, signal_handler)
+    initialize()
+    test_v2()
+
+else:
+    print(__file__,__name__)
   
   
   
