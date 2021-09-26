@@ -45,6 +45,10 @@ g_r=0
 g_dl=0
 g_dr=0
 
+delta_L=0
+delta_R=0
+encoder_data_is_reliable = True
+
 left_total=0
 right_total=0
 l_target = 0  #left wheel target speed - in encoder ticks per 10ms
@@ -252,13 +256,16 @@ def read_encoders():
     read the encoders from the romi board and from that generate delta since the last read.
     filter out bad readings
     """
-    global left_ticks,right_ticks,last_left_ticks,last_right_ticks,delta_L,delta_R
+    global left_ticks,right_ticks,last_left_ticks,last_right_ticks,delta_L,delta_R,encoder_data_is_reliable
+
+    encoder_data_is_reliable=True
 
     left_ticks,right_ticks = a_star.read_encoders()
     if a_star.error:
       left_ticks,right_ticks = a_star.read_encoders()
       if a_star.error:
         print("read_encoders(): double error")
+        encoder_data_is_reliable = False
 
     delta_L = left_ticks - last_left_ticks
     delta_R = right_ticks - last_right_ticks
@@ -273,11 +280,12 @@ def read_encoders():
       delta_R = 65536 + delta_R
 
     #ignore faulty readings
-    
+    #maybe it would be better to repeat the last reading?
     if abs(delta_L) > 200 or abs(delta_R) > 200:
       delta_L = 0
       delta_R = 0
       #print(delta_L,delta_R)
+      encoder_data_is_reliable=False
     else:
       last_left_ticks = left_ticks
       last_right_ticks = right_ticks
@@ -434,20 +442,36 @@ while not rospy.is_shutdown():
     #odometry_update(delta_L,delta_R)
     #print(x,y,th,g_x,g_y,g_theta)
     
+    if abs(delta_L - l_target) > 10:
+      l_cmd_increment = 4
+    else:
+      l_cmd_increment = 1
+
+    if abs(delta_R - r_target) > 10:
+      r_cmd_increment = 4
+    else:
+      r_cmd_increment = 1
+
     if delta_L > l_target:
-      l_cmd -= 1
+      l_cmd -= l_cmd_increment
+
     if delta_L < l_target:
-      l_cmd += 1
+      l_cmd += l_cmd_increment
+
     if delta_R > r_target:
-      r_cmd -= 1
+      r_cmd -= r_cmd_increment
+
     if delta_R < r_target:
-      r_cmd += 1
+      r_cmd += r_cmd_increment
 
-    if l_target == 0 and abs(delta_L) < 2:
-      l_cmd = 0
-
-    if r_target == 0 and abs(delta_R) < 2:
-      r_cmd = 0
+    if encoder_data_is_reliable:
+      #if we are trying to stop, and havel already almost stopped, then simply set the command to 0 
+      #so that we come to a full stop
+      #but do this only if we can trust the encoder data
+      if l_target == 0 and abs(delta_L) < 2:
+        l_cmd = 0
+      if r_target == 0 and abs(delta_R) < 2:
+        r_cmd = 0
 
     a_star.motors(l_cmd, r_cmd)
     #print(l_cmd,r_cmd)
