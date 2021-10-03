@@ -65,7 +65,7 @@ def th_delta(th_old, th_new):
 
 
 def initialize():
-    global f, th1, heading_uncal_old
+    global f, heading_uncal_old
     # baud rate value does not matter actually
     f = serial.Serial('/dev/ttyACM0', 1000000)
     f.flushInput()
@@ -77,8 +77,6 @@ def initialize():
     print("### start of data stream found ###")
 
     heading_uncal_old = r[1]
-    th1 = heading_uncal_old
-    angle = 0.0
 
     f.timeout = 0.011
 
@@ -105,7 +103,7 @@ def get_reading():
 
 
 def update_heading_v2():
-    global timestamp, heading_calib, heading_uncal_new, heading_delta_uncal, heading_delta_uncal_accumulated, heading_delta_calib, heading_delta_calib_accumulated, th1, heading_uncal_old
+    global timestamp, heading_calib, heading_uncal_new, heading_delta_uncal, heading_delta_uncal_accumulated, heading_delta_calib, heading_delta_calib_accumulated, heading_uncal_old
 
     if abs(heading_delta_uncal) < noise_floor:
         heading_delta_uncal = 0.0
@@ -127,7 +125,7 @@ def update_heading_v2():
 
 
 def update_heading():
-    global timestamp, heading_calib, heading_uncal_new, heading_delta_uncal, heading_delta_uncal_accumulated, heading_delta_calib, heading_delta_calib_accumulated, th1, heading_uncal_old
+    global timestamp, heading_calib, heading_uncal_new, heading_delta_uncal, heading_delta_uncal_accumulated, heading_delta_calib, heading_delta_calib_accumulated, heading_uncal_old
     try:
         b = f.read(50)  # total size is actually 52, so let's read at least 50
         if len(b) > 0:
@@ -171,7 +169,7 @@ def update_heading():
 
 def update():
 
-    global timestamp, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, th1, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
+    global timestamp, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
 
     data = get_reading()
 
@@ -199,7 +197,7 @@ def update():
 
 def test_v2():
 
-    global timestamp, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, th1, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
+    global timestamp, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
 
     t_print = t = t_last = time.monotonic()
 
@@ -229,7 +227,7 @@ def test_v2():
 
 
 def test():
-    global heading_calib, heading_uncal_new, th1, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
+    global heading_calib, heading_uncal_new, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
     dth1_total_previous = 0.0
     t_print = t = time.monotonic()
     while done == False:
