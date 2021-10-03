@@ -48,9 +48,9 @@ done = False
 
 
 # Parameters
-wheeltrack = 0.1410 #0.1400  # 0.1415
-wheelradius_L = 0.0364
-wheelradius_R = 0.0338
+wheeltrack = 0.1400 #0.1400  # 0.1415
+wheelradius_L = 0.0348 #0.0364
+wheelradius_R = 0.0348
 TPR = 1440  # 120 *12
 left_ticks = 0
 right_ticks = 0
