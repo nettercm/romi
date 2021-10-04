@@ -12,7 +12,7 @@ done = False
 
 def signal_handler(sig, frame):
     global done
-    #print('You pressed Ctrl+C!')
+    print('You pressed Ctrl+C!')
     #a_star.motors(0, 0);
     # sys.exit(0)
     done = True
@@ -86,6 +86,11 @@ def initialize():
     heading_uncal_old = r[1]
 
     f.timeout = 0.011
+
+
+def deinitialize():
+    global f
+    f.close()
 
 
 def get_reading():
@@ -270,6 +275,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
     initialize()
     test_v2()
+    deinitialize()
 
 else:
     print(__file__, __name__)
