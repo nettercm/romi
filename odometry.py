@@ -238,6 +238,7 @@ def odometry_update_v2(delta_L, delta_R, delta_T):
 
     global initialized2
     global x, y, th
+    global vx, vy, vth
 
     # make sure that we always start at 0,0 when this node is restarted
     # at least during testing, that makes sense
