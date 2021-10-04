@@ -40,10 +40,17 @@ noise_floor = 0.01
 
 dps = 0.0
 dps_max = 0.0
+
+
 done = False
 t_print = 0.0
 f = None
+
+
 timestamp = 0
+
+
+line = [0,0,0,0,0,0,0,0]
 
 
 def between(x_min, x, x_max):
@@ -169,7 +176,7 @@ def update_heading():
 
 def update():
 
-    global timestamp, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
+    global timestamp, line, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
 
     data = get_reading()
 
@@ -189,6 +196,8 @@ def update():
         if dps > dps_max:
             dps_max = dps
 
+        line = data[2:10]
+
     if data != None:
         return True
     else:
@@ -197,7 +206,7 @@ def update():
 
 def test_v2():
 
-    global timestamp, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
+    global timestamp, line, heading_delta_uncal, heading_calib, heading_uncal_new, heading_uncal_old, heading_delta_calib, heading_delta_calib_accumulated, dps, dps_max, done
 
     t_print = t = t_last = time.monotonic()
 
@@ -223,6 +232,7 @@ def test_v2():
         if t - t_print > 0.0:  # print at 5Hz instead of the full 100Hz
             print("%8d, %7.3f, %8.4f, %8.4f, %11.2f, dps=%6.2f %s" % (timestamp, t,
                   heading_calib, heading_uncal_new, heading_delta_calib_accumulated, dps, flag))
+            #print(line)
             t_print = t
 
 

@@ -15,7 +15,7 @@ import rospy
 import tf
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point,  Pose,  Quaternion,  Twist,  Vector3,  PointStamped
-from std_msgs.msg import Int16, Int32
+from std_msgs.msg import Int16, Int32, Int32MultiArray
 
 # qtpy "driver"
 import qtpy
@@ -34,9 +34,10 @@ def signal_handler(sig, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-rospy.init_node('imu_publisher')
+rospy.init_node('qtpy_publisher')
 
 imu_pub = rospy.Publisher("imu", PointStamped, queue_size=5, tcp_nodelay=True)
+line_pub = rospy.Publisher("line", Int32MultiArray, queue_size=5, tcp_nodelay=True)
 
 current_time = last_time = rospy.Time.now()
 
@@ -60,8 +61,12 @@ while not rospy.is_shutdown():
 
     imu_data = PointStamped()
     imu_data.header.stamp = current_time
-    imu_data.header.frame_id = "odom"
+    imu_data.header.frame_id = "base_link"
     imu_data.point.x = qtpy.heading_calib
     imu_data.point.y = qtpy.heading_delta_calib_accumulated
     imu_data.point.z = qtpy.dps
     imu_pub.publish(imu_data)
+
+    line_data = Int32MultiArray(data=qtpy.line)
+    line_pub.publish(line_data)
+   
