@@ -480,6 +480,12 @@ while not rospy.is_shutdown():
         if r_target == 0 and abs(delta_R) < 2:
             r_cmd = 0
 
+    # prevent wind-up of the commanded value
+    if l_cmd >  400: l_cmd =  400
+    if l_cmd < -400: l_cmd = -400
+    if r_cmd >  400: r_cmd =  400
+    if r_cmd < -400: r_cmd = -400
+
     a_star.motors(l_cmd, r_cmd)
     # print(l_cmd,r_cmd)
 
