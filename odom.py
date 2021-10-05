@@ -298,8 +298,8 @@ def cmd_vel_callback(msg):
     #rospy.loginfo("Received a /cmd_vel message!")
     #rospy.loginfo("Linear Components: [%f, %f, %f]"%(msg.linear.x, msg.linear.y, msg.linear.z))
     #rospy.loginfo("Angular Components: [%f, %f, %f]"%(msg.angular.x, msg.angular.y, msg.angular.z))
-    l_target = int((msg.linear.x - msg.angular.z) * 100)
-    r_target = int((msg.linear.x + msg.angular.z) * 100)
+    l_target = int((msg.linear.x - msg.angular.z) * 60)
+    r_target = int((msg.linear.x + msg.angular.z) * 60)
 
 
 def imu_callback(msg):
