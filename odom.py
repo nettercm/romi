@@ -459,6 +459,10 @@ while not rospy.is_shutdown():
     else:
         r_cmd_increment = 1
 
+    # decellerate faster if we are trying to stop
+    if l_target == 0  and  abs(delta_L - l_target) > 20 : l_cmd_increment = 10
+    if r_target == 0  and  abs(delta_R - r_target) > 20 : r_cmd_increment = 10
+
     if delta_L > l_target:
         l_cmd -= l_cmd_increment
 
