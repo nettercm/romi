@@ -298,8 +298,8 @@ def cmd_vel_callback(msg):
     #rospy.loginfo("Received a /cmd_vel message!")
     #rospy.loginfo("Linear Components: [%f, %f, %f]"%(msg.linear.x, msg.linear.y, msg.linear.z))
     #rospy.loginfo("Angular Components: [%f, %f, %f]"%(msg.angular.x, msg.angular.y, msg.angular.z))
-    l_target = int((msg.linear.x - msg.angular.z) * 60)
-    r_target = int((msg.linear.x + msg.angular.z) * 60)
+    l_target = int((msg.linear.x - msg.angular.z/14) * 68)
+    r_target = int((msg.linear.x + msg.angular.z/14) * 68)
 
 
 def imu_callback(msg):
@@ -505,17 +505,18 @@ while not rospy.is_shutdown():
             i.data = int(b)
             battery_pub.publish(i)
 
-    print("b=%5d, l_cmd=%4d, r_cmd=%4d, left_t=%6d, right_t=%6d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.3f y=%7.3f th=%8.3f" %
-          (int(b),
-           l_cmd,
-           r_cmd,
-           left_ticks,
-           right_ticks,
-           delta_L,
-           delta_R,
-           l_target,
-           r_target,
-           odometry.x, odometry.y, degs(norm(odometry.th))))
+        print("t=%8.2f, b=%5d, l_cmd=%4d, r_cmd=%4d, left_t=%6d, right_t=%6d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.3f y=%7.3f th=%8.3fdeg th=%8.3frad" %
+            (time.monotonic(),
+            int(b),
+            l_cmd,
+            r_cmd,
+            left_ticks,
+            right_ticks,
+            delta_L,
+            delta_R,
+            l_target,
+            r_target,
+            odometry.x, odometry.y, degs(norm(odometry.th)),odometry.th))
 
     last_time = current_time
 
