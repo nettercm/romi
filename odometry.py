@@ -269,8 +269,8 @@ def odometry_update_v2(delta_L, delta_R, delta_T):
     th = (th+dth) % (2 * pi)
 
     if dt > 0:
-        vx = dx/dt
-        vy = dy/dt
+        vx = dc/dt  # dx/dt
+        vy = 0.0    # dy/dt
         vth = dth/dt
     else:
         vx = 0
