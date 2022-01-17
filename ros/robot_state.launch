@@ -1,0 +1,17 @@
+<!-- 
+ test.launch
+-->
+
+<launch>
+
+
+  <!-- The robot description -->
+  <param name="robot_description" textfile="./robot.urdf"/>
+
+  <!-- The robot state publisher -->
+  <node  pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state" respawn="true" output="log">
+    <rosparam file="./robot_state_publisher_params.yaml" command="load"/>
+  </node>
+
+
+</launch>

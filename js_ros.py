@@ -48,7 +48,7 @@ js.js_init()
 while (not done) and (not rospy.is_shutdown()):
 
     y =  -js.axis_states['y']    # left  joystick, up/down axis
-    rx = -js.axis_states['rx']   # right joystick  left/right axis
+    rx = -js.axis_states['z']   # right joystick  left/right axis
 
     # convert the joystick values into linear and angular velocity up to "max_speed"
     js_linear_velocity = y    * 0.7    # set max linear velocity to 0.7 meters per second

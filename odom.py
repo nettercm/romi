@@ -17,8 +17,11 @@ import threading
 import sys
 import signal
 import time
+import numpy as np
 from i2c_testing.p2_i2c_test import AStar
 import odometry
+from sensor_msgs.msg import Range
+
 print("doing imports...this could take a few seconds!")
 
 #from odometry import odometry_update_v2
@@ -305,6 +308,106 @@ def cmd_vel_callback(msg):
 def imu_callback(msg):
     odometry.th = rads(msg.point.x)
 
+
+
+
+ir_far_xp = [130, 145, 165, 183, 197, 210, 263, 337, 419, 576, 700, 840]
+ir_far_fp = [60, 48, 40, 30, 25, 20, 15, 10, 7.5, 5, 4, 3]
+
+ir_near_xp = [65, 112, 201, 257, 325, 467, 580, 660, 800]
+ir_near_fp = [30, 20, 10, 8, 6, 4, 3, 2.5, 2]
+
+ir_left = 0.0
+ir_front= 0.0
+ir_right= 0.0
+us_left = 4000
+us_right= 4000
+
+def process_range_sensors():
+
+    global ir_left,ir_front,ir_right,us_left,us_right
+
+    analog = a_star.read_analog()
+    if a_star.error: analog = a_star.read_analog()
+ 
+    # convert the raw ADC readings from the Sharp IR sensors into distance in mm
+    ir_left  = np.interp( analog[3], ir_near_xp, ir_near_fp ) * 25.4
+    ir_front = np.interp( analog[1], ir_far_xp,  ir_far_fp  ) * 25.4
+    ir_right = np.interp( analog[2], ir_near_xp, ir_near_fp ) * 25.4
+
+    # for now, the romi control board returns the sonar readings as if it were ADC readings; via index 0 and 4 (out of ADC 0....5)
+    us_left  = analog[0]
+    us_right = analog[4]
+
+    # if we are getting zeros for the sonars, it means we are not getting data; probably just testing the code w/out power
+    # to the romi controller;  simply set the invalid distance reading to a far out value
+    if us_left  == 0:  us_left  = 4000
+    if us_right == 0:  us_right = 4000
+
+    us_left_msg = Range()
+
+    us_left_msg.radiation_type = Range.ULTRASOUND
+    us_left_msg.field_of_view = 0.7
+    us_left_msg.max_range = 1.0
+    us_left_msg.min_range = 0.005
+    us_left_msg.range = us_left / 1000.0
+    us_left_msg.header.frame_id = "base_left_us"
+    us_left_msg.header.stamp = rospy.Time.now()
+    
+    us_left_pub.publish(us_left_msg)
+
+    us_right_msg = Range()
+
+    us_right_msg.radiation_type = Range.ULTRASOUND
+    us_right_msg.field_of_view = 0.7
+    us_right_msg.max_range = 1.0
+    us_right_msg.min_range = 0.005
+    us_right_msg.range = us_right / 1000.0
+    us_right_msg.header.frame_id = "base_right_us"
+    us_right_msg.header.stamp = rospy.Time.now()
+    
+    us_right_pub.publish(us_right_msg)
+
+    ir_left_msg = Range()
+
+    ir_left_msg.radiation_type = Range.INFRARED
+    ir_left_msg.field_of_view = 0.1
+    ir_left_msg.max_range = 0.6
+    ir_left_msg.min_range = 0.05
+    ir_left_msg.range = ir_left / 1000.0
+    ir_left_msg.header.frame_id = "base_left_ir"
+    ir_left_msg.header.stamp = rospy.Time.now()
+    
+    ir_left_pub.publish(ir_left_msg)
+
+    ir_right_msg = Range()
+
+    ir_right_msg.radiation_type = Range.INFRARED
+    ir_right_msg.field_of_view = 0.1
+    ir_right_msg.max_range = 0.6
+    ir_right_msg.min_range = 0.05
+    ir_right_msg.range = ir_right / 1000.0
+    ir_right_msg.header.frame_id = "base_right_ir"
+    ir_right_msg.header.stamp = rospy.Time.now()
+    
+    ir_right_pub.publish(ir_right_msg)
+
+    ir_center_msg = Range()
+
+    ir_center_msg.radiation_type = Range.INFRARED
+    ir_center_msg.field_of_view = 0.1
+    ir_center_msg.max_range = 1.5
+    ir_center_msg.min_range = 0.08
+    ir_center_msg.range = ir_front / 1000.0
+    ir_center_msg.header.frame_id = "base_center_ir"
+    ir_center_msg.header.stamp = rospy.Time.now()
+    
+    ir_center_pub.publish(ir_center_msg)
+
+
+
+
+
 print("entering loop")
 
 # Parameters
@@ -327,20 +430,23 @@ vth = 0.0
 
 initialized = 0
 
-rospy.init_node('odometry_publisher')
+rospy.init_node('romi_control_board_publisher')
 
-odom_pub = rospy.Publisher("odom", Odometry, queue_size=50, tcp_nodelay=True)
 odom_broadcaster = tf.TransformBroadcaster()
 
-encoders_pub = rospy.Publisher(
-    "encoders", PointStamped, queue_size=50, tcp_nodelay=True)
-battery_pub = rospy.Publisher(
-    "battery", Int32, queue_size=50, tcp_nodelay=True)
+odom_pub =    rospy.Publisher("odom",     Odometry,     queue_size=20, tcp_nodelay=True)
+encoders_pub =rospy.Publisher("encoders", PointStamped, queue_size=20, tcp_nodelay=True)
+battery_pub = rospy.Publisher("battery",  Int32,        queue_size=20, tcp_nodelay=True)
 
-cmd_vel_sub = rospy.Subscriber(
-    "cmd_vel", Twist, cmd_vel_callback, tcp_nodelay=True)
+us_left_pub = rospy.Publisher("us_left",  Range,        queue_size=5, tcp_nodelay=True)
+us_right_pub =rospy.Publisher("us_right", Range,        queue_size=5, tcp_nodelay=True)
 
-imu_sub = rospy.Subscriber("imu", PointStamped, imu_callback, tcp_nodelay=True)
+ir_left_pub  =rospy.Publisher("ir_left",  Range,        queue_size=5, tcp_nodelay=True)
+ir_center_pub=rospy.Publisher("ir_center",Range,        queue_size=5, tcp_nodelay=True)
+ir_right_pub =rospy.Publisher("ir_right", Range,        queue_size=5, tcp_nodelay=True)
+
+cmd_vel_sub = rospy.Subscriber("cmd_vel", Twist,        cmd_vel_callback, tcp_nodelay=True)
+imu_sub =     rospy.Subscriber("imu",     PointStamped, imu_callback,     tcp_nodelay=True)
 
 current_time = rospy.Time.now()
 last_time = rospy.Time.now()
@@ -356,9 +462,17 @@ read_encoders()
 last_left_ticks = left_ticks
 last_right_ticks = right_ticks
 
+t_last_range_sensor_update = time.monotonic()
+
 while not rospy.is_shutdown():
 
     current_time = rospy.Time.now()
+
+    # publish the range sensors at a fixed rate of 20Hz for now
+    t = time.monotonic()
+    if t - t_last_range_sensor_update > 0.05:
+        process_range_sensors()
+        t_last_range_sensor_update = t
 
     # monitor timing.  doesn't seem to be an issue provided that the node
     # started with chrt -f 60
@@ -505,7 +619,7 @@ while not rospy.is_shutdown():
             i.data = int(b)
             battery_pub.publish(i)
 
-        print("t=%8.2f, b=%5d, l_cmd=%4d, r_cmd=%4d, left_t=%6d, right_t=%6d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.3f y=%7.3f th=%8.3fdeg th=%8.3frad" %
+        print("t=%8.2f, b=%5d, l_cmd=%4d, r_cmd=%4d, left_t=%6d, right_t=%6d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.3f y=%7.3f th=%8.3fdeg th=%8.3frad  us=%5d.%5d" %
             (time.monotonic(),
             int(b),
             l_cmd,
@@ -516,7 +630,8 @@ while not rospy.is_shutdown():
             delta_R,
             l_target,
             r_target,
-            odometry.x, odometry.y, degs(norm(odometry.th)),odometry.th))
+            odometry.x, odometry.y, degs(norm(odometry.th)),odometry.th,
+            us_left, us_right))
 
     last_time = current_time
 

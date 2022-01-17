@@ -61,7 +61,7 @@ t_print = time.time()
 
 js.js_init()
 
-max_speed = 100
+max_speed = 300
 
 t_last_print = time.monotonic()
 
@@ -84,6 +84,8 @@ measured_speed_history_index = 0
 
 l_speed_adjust = 0
 r_speed_adjust = 0
+
+avoid_obstacles = False
 
 while done == 0:
 
@@ -132,7 +134,7 @@ while done == 0:
     t = time.monotonic()
 
     y = -js.axis_states['y']    # left  joystick, up/down axis
-    rx = js.axis_states['rx']   # right joystick  left/right axis
+    rx = js.axis_states['z']   # right joystick  left/right axis
 
     # convert the joystick values into linear and angular velocity up to "max_speed"
     js_linear_velocity = y * max_speed
@@ -155,7 +157,6 @@ while done == 0:
     
     # the faster we go, the stronger we need to steer
     avoidance_angular_velocity = (commanded_linear_velocity / 1.0)  + sign(commanded_linear_velocity) #make sure its not zero
-
 
     # are we getting too close to something in front WHILE the user is commanding us to go forward?
     # if the user is not trying to go forward, this logic won't kick in!
@@ -238,14 +239,16 @@ while done == 0:
             if target_angular_velocity > 0:
                 target_angular_velocity =  15
 
-    #for testing purposes, ignore the obstacle avoidance and just listen to the user
-    #target_angular_velocity = js_angular_velocity
-    #target_linear_velocity = js_linear_velocity
+    if avoid_obstacles == False:
+        #for testing purposes, ignore the obstacle avoidance and just listen to the user
+        linear_accelleration = 4
+        target_angular_velocity = js_angular_velocity
+        target_linear_velocity = js_linear_velocity
     
 
     # ramp up or down to our target angular velocity, using a small deadband of +/- 6 
-    if commanded_angular_velocity < target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity + 2
-    if commanded_angular_velocity > target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity - 2
+    if commanded_angular_velocity < target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity + 5
+    if commanded_angular_velocity > target_angular_velocity:              commanded_angular_velocity = commanded_angular_velocity - 5
     if abs( commanded_angular_velocity - target_angular_velocity ) < 6:   commanded_angular_velocity = target_angular_velocity
 
 

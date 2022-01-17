@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<robot name="robot">
+
+  <!-- The base link -->
+  <link name="base_link">
+
+    <!-- The base -->
+    <visual>
+      <geometry>
+        <cylinder length="0.01" radius="0.083"/>
+      </geometry>
+      <origin xyz="0 0 0.03"/>
+      <material name="cyan">
+        <color rgba="0.43 0.68 0.69 1"/>
+      </material>
+    </visual>
+
+    <visual>
+      <geometry>
+        <cylinder length="0.01" radius="0.083"/>
+      </geometry>
+      <origin xyz="0 0 0.09"/>
+      <material name="cyan">
+        <color rgba="0.43 0.68 0.69 1"/>
+      </material>
+    </visual>
+
+    <!-- The left tire -->
+    <visual>
+      <geometry>
+        <cylinder length="0.008" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 -0.07 0.05" rpy="1.57 0 0"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+
+    <!-- The rigth tire -->
+    <visual>
+      <geometry>
+        <cylinder length="0.008" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0.07 0.05" rpy="-1.57 0 0"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+
+  </link>
+
+  <!-- The base laser -->
+  <link name="laser">
+
+    <visual>
+      <geometry>
+        <cylinder length="0.045" radius="0.038"/>
+      </geometry>
+      <origin xyz="0 0 0.1"/>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+
+  </link>
+
+  <!-- The base left sonar -->
+  <link name="base_left_us">
+  </link>
+
+  <!-- The base right sonar -->
+  <link name="base_right_us">
+  </link>
+
+  <!-- The base center infrared -->
+  <link name="base_center_ir">
+  </link>
+
+  <!-- The base left infrared -->
+  <link name="base_left_ir">
+  </link>
+
+  <!-- The base right infrared -->
+  <link name="base_right_ir">
+  </link>
+
+
+  <!-- The base imu -->
+  <link name="base_imu">
+  </link>
+
+  <!-- The camera link -->
+  <link name="camera_link">
+  </link>
+
+  <!-- The base_link -> laser joint -->
+  <joint name="base_link_to_laser" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser"/>
+    <origin xyz="0.000 0.000 0.00" rpy="0 0 3.1415927"/>
+  </joint>
+
+  <!-- The base_link -> base_left_us joint -->
+  <joint name="base_link_to_base_left_us" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_left_us"/>
+    <origin xyz="0.07 0.038 0.055" rpy="0 0 0"/>
+  </joint>
+
+  <!-- The base_link -> base_right_us joint -->
+  <joint name="base_link_to_base_right_us" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_right_us"/>
+    <origin xyz="0.07 -0.038 0.055" rpy="0 0 0"/>
+  </joint>
+
+  <!-- The base_link -> base_center_ir joint -->
+  <joint name="base_link_to_base_center_ir" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_center_ir"/>
+    <origin xyz="0.07 0 0.055" rpy="0 0 0"/>
+  </joint>
+
+  <!-- The base_link -> base_center_ir joint -->
+  <joint name="base_link_to_base_left_ir" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_left_ir"/>
+    <origin xyz="0.05 0.055 0.055" rpy="0 0 0.8"/>
+  </joint>
+
+  <!-- The base_link -> base_center_ir joint -->
+  <joint name="base_link_to_base_right_ir" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_right_ir"/>
+    <origin xyz="0.05 -0.055 0.055" rpy="0 0 -1"/>
+  </joint>
+
+
+  <!-- The base_link -> base_imu joint -->
+  <joint name="base_link_to_base_imu" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_imu"/>
+    <origin xyz="-0.120 -0.050 0.060" rpy="0 0 0"/>
+  </joint>
+
+  <!-- The base_link -> camera_link joint -->
+  <joint name="base_link_to_camera_link" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+    <origin xyz="0.110 -0.030 0.13" rpy="0 0 0"/>
+  </joint>
+
+</robot>
