@@ -78,7 +78,7 @@ def scan_callback(scan_msg : LaserScan):
     l = len(scan_msg.ranges)
     valid = 0
 
-    ranges = [9,9,9,9,9,9,9,9,9,9,9,9]
+    ranges = [99,99,99,99,99,99,99,99,99,99,99,99]
 
     hz = (3.0*last_hz + (1.0 / scan_msg.scan_time)) / 4.0
     last_hz = hz
