@@ -78,7 +78,8 @@ def scan_callback(scan_msg : LaserScan):
     l = len(scan_msg.ranges)
     valid = 0
 
-    ranges = [99,99,99,99,99,99,99,99,99,99,99,99]
+    minimums = [99,99,99,99,99,99,99,99,99,99,99,99]
+    averages = [0,0,0,0,0,0,0,0,0,0,0,0]
 
     hz = (3.0*last_hz + (1.0 / scan_msg.scan_time)) / 4.0
     last_hz = hz
@@ -87,6 +88,8 @@ def scan_callback(scan_msg : LaserScan):
         s = (i * 60) - 30
         if s < 0:
             s = s + 720
+        sum = 0.0
+        count = 0
         for j in range(0,60):
             v = scan_msg.ranges[s]
             s = s + 1
@@ -94,11 +97,22 @@ def scan_callback(scan_msg : LaserScan):
                 s = 0
             if v != float("inf"):
                 valid = valid + 1
-                if v < ranges[i]:
-                    ranges[i] = v
+                count = count + 1
+                sum = sum + v
+                #use the minimum reading as the final value
+                if v < minimums[i]:
+                    minimums[i] = v
+                #use the average reading as the final value 
+                averages[i] = sum / count
 
     #print("%5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f " % (ranges[0],ranges[1],ranges[2],ranges[3],ranges[4],ranges[5],ranges[6],ranges[7],ranges[8],ranges[9],ranges[10],ranges[11]))
-    print("%3.1fHz  len=%3d  valid=%3d   %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f  " % (hz, l , valid, ranges[3],ranges[2],ranges[1],ranges[0],ranges[11],ranges[10],ranges[9]))
+    print("%3.1fHz  len=%3d  valid=%3d   %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f      %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f  " % 
+        (
+            hz, l , valid, 
+            minimums[3],minimums[2],minimums[1],minimums[0],minimums[11],minimums[10],minimums[9],
+            averages[3],averages[2],averages[1],averages[0],averages[11],averages[10],averages[9],
+        )
+    )
 
     return
 
