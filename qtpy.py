@@ -228,8 +228,9 @@ def test_v2():
         flag = " "
         if t - t_last > 0.014:
             flag = "timing!"
-        if t - t_last < 0.006:
-            flag = "timing!"
+        #timing errors usually come in pairs, so no need to flag the second one
+        #if t - t_last < 0.006:
+        #    flag = "timing!"
         t_last = t
 
         # if False:
