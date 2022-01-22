@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-print("starging scan.py");
+print("starting scan.py")
 
 import time, signal, sys, threading, math, os, copy
 from math import cos,sin,pi
@@ -15,6 +15,8 @@ from sensor_msgs.msg import LaserScan,PointCloud2,PointCloud
 
 import sensor_msgs.point_cloud2 as pc2
 import laser_geometry.laser_geometry as lg
+
+from sensor_msgs.msg import Range
 
 
 def rads(degrees):
@@ -71,15 +73,15 @@ last_publish = rospy.Time(0)
 last_hz = 0
 
 def scan_callback(scan_msg : LaserScan):
-    global skip_scan, dps, last_publish, last_hz
+    global skip_scan, dps, last_publish, last_hz, frame_id, laser_pub
 
     t = rospy.Time.now()
 
     l = len(scan_msg.ranges)
     valid = 0
 
-    minimums = [99,99,99,99,99,99,99,99,99,99,99,99]
-    averages = [0,0,0,0,0,0,0,0,0,0,0,0]
+    minimums = [99,99,99,99,99,99,99,99,99,99,99,99,99]
+    averages = [0,0,0,0,0,0,0,0,0,0,0,0,0]
 
     hz = (3.0*last_hz + (1.0 / scan_msg.scan_time)) / 4.0
     last_hz = hz
@@ -114,14 +116,44 @@ def scan_callback(scan_msg : LaserScan):
         )
     )
 
+    averages[12] = averages[0]
+    minimums[12] = minimums[0]
+    laser_msg = Range()
+    for i in range(0,12):
+        laser_msg.radiation_type = Range.INFRARED
+        laser_msg.field_of_view = 0.523599  # 30 degrees
+        laser_msg.max_range = 9.0
+        laser_msg.min_range = 0.14
+        laser_msg.range = minimums[12-i]
+        laser_msg.header.frame_id = frame_id[i]
+        laser_msg.header.stamp = scan_msg.header.stamp
+        laser_pub[i].publish(laser_msg)
+
+
     return
 
 
 
 
-rospy.init_node('scan')
+rospy.init_node('virtual_distance')
 
 scan_sub =  rospy.Subscriber("scan",     LaserScan,    scan_callback)
+
+laser_pub = [None,None,None,None,None,None,None,None,None,None,None,None]
+frame_id  = ["laser0","laser1","laser2","laser3","laser4","laser5","laser6","laser7","laser8","laser9","laser10","laser11"]
+
+laser_pub[0]  =rospy.Publisher("laser0",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[1]  =rospy.Publisher("laser1",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[2]  =rospy.Publisher("laser2",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[3]  =rospy.Publisher("laser3",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[4]  =rospy.Publisher("laser4",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[5]  =rospy.Publisher("laser5",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[6]  =rospy.Publisher("laser6",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[7]  =rospy.Publisher("laser7",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[8]  =rospy.Publisher("laser8",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[9]  =rospy.Publisher("laser9",  Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[10] =rospy.Publisher("laser10", Range,        queue_size=5, tcp_nodelay=True)
+laser_pub[11] =rospy.Publisher("laser11", Range,        queue_size=5, tcp_nodelay=True)
 
 
 TWO_PI = 2.0 * pi
