@@ -618,7 +618,7 @@ while not rospy.is_shutdown():
             i = Int32()
             i.data = int(b)
             battery_pub.publish(i)
-
+        '''
         print("t=%8.2f, b=%5d, l_cmd=%4d, r_cmd=%4d, left_t=%6d, right_t=%6d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.3f y=%7.3f th=%8.3fdeg th=%8.3frad  us=%5d.%5d" %
             (time.monotonic(),
             int(b),
@@ -632,7 +632,25 @@ while not rospy.is_shutdown():
             r_target,
             odometry.x, odometry.y, degs(norm(odometry.th)),odometry.th,
             us_left, us_right))
+        '''
 
     last_time = current_time
+
+    t_error = delta_T - 0.01
+    if True: #abs(t_error) > 0.0002:
+        print("t=%9.3f, t_error=%9.6f, b=%5d, l_cmd=%4d, r_cmd=%4d, left_t=%6d, right_t=%6d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.3f y=%7.3f th=%8.3fdeg th=%8.3frad  us=%5d.%5d" %
+            (t,
+            t_error,
+            int(b),
+            l_cmd,
+            r_cmd,
+            left_ticks,
+            right_ticks,
+            delta_L,
+            delta_R,
+            l_target,
+            r_target,
+            odometry.x, odometry.y, degs(norm(odometry.th)),odometry.th,
+            us_left, us_right))
 
     r.sleep()
