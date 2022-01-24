@@ -35,6 +35,7 @@ PI = 3.1415926535897932384626433832795
 K_rad_to_deg = (180.0/3.1415926535897932384626433832795)
 K_deg_to_rad = (PI/180.0)
 
+'''
 odo_cml = 0.15271631  # calculated based on wheel, gear and encoder specs...
 odo_cmr = 0.15271631  # 0.15171631
 odo_b = 148.0  # 143.0 #between 150 and 136
@@ -47,7 +48,7 @@ g_l = 0
 g_r = 0
 g_dl = 0
 g_dr = 0
-
+'''
 delta_L = 0
 delta_R = 0
 encoder_data_is_reliable = True
@@ -115,7 +116,7 @@ def signal_handler(sig, frame):
 
 #######################################################################
 
-
+'''
 def debug_thread(name):
     global g_l, g_r, g_dl, g_dr
     while 1:
@@ -204,7 +205,7 @@ def speed_control_thread(name):
 
         # now let's write
         a_star.motors(l_cmd, r_cmd)
-
+'''
 #######################################################################
 
 
@@ -226,6 +227,9 @@ t2.start()
 """
 
 
+#######################################################################
+
+
 def rads(degrees):
     """
     convert from degrees to radians
@@ -233,11 +237,17 @@ def rads(degrees):
     return degrees * pi / 180.0
 
 
+#######################################################################
+
+
 def degs(radians):
     """
     convert from radians to degrees
     """
     return radians * 180 / pi
+
+
+#######################################################################
 
 
 def norm(theta):
@@ -250,6 +260,9 @@ def norm(theta):
     if normalized > pi:
         normalized = normalized - TWO_PI
     return normalized
+
+
+#######################################################################
 
 
 def read_encoders():
@@ -292,6 +305,9 @@ def read_encoders():
         last_right_ticks = right_ticks
 
 
+#######################################################################
+
+
 def cmd_vel_callback(msg):
     """
     The cmd_vel_callback() gets called every time a new message of type /cmd_vel is received.
@@ -305,10 +321,14 @@ def cmd_vel_callback(msg):
     r_target = int((msg.linear.x + msg.angular.z/14) * 68)
 
 
+#######################################################################
+
+
 def imu_callback(msg):
     odometry.th = rads(msg.point.x)
 
 
+#######################################################################
 
 
 ir_far_xp = [130, 145, 165, 183, 197, 210, 263, 337, 419, 576, 700, 840]
