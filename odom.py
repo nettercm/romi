@@ -491,39 +491,6 @@ while not rospy.is_shutdown():
 
     odometry.odometry_update_v2(delta_L, delta_R, delta_T)
 
-    """
-    dl = 2 * pi * wheelradius_L * delta_L / TPR
-    dr = 2 * pi * wheelradius_R * delta_R / TPR
-    dc = (dl + dr) / 2
-    dt = (current_time - last_time).to_sec()
-    dth = (dr-dl)/wheeltrack
-    
-    #if dr==dl:
-    if abs(dr-dl) < 0.001:    
-        dx=dr*cos(th)
-        dy=dr*sin(th)
-
-    else:
-        radius=dc/dth
-        iccX=x-radius*sin(th)
-        iccY=y+radius*cos(th)
-        dx = cos(dth) * (x-iccX) - sin(dth) * (y-iccY) + iccX - x
-        dy = sin(dth) * (x-iccX) + cos(dt) * (y-iccY) + iccY - y
-
-    x += dx  
-    y += dy 
-    th =(th+dth) %  (2 * pi)
-
-    if dt>0:
-       vx=dx/dt
-       vy=dy/dt
-       vth=dth/dt
-    else:
-        vx=0
-        vy=0
-        vth=0
-    """
-
     odom_quat = tf.transformations.quaternion_from_euler(0, 0, odometry.th)
 
     # first, we'll publish the transform over tf
