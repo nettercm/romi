@@ -146,7 +146,7 @@ def read_encoders():
 
     # ignore faulty readings
     # maybe it would be better to repeat the last reading?
-    if abs(delta_L) > 100 or abs(delta_R) > 100:
+    if abs(delta_L) > 400 or abs(delta_R) > 400:
         delta_L = 0
         delta_R = 0
         # print(delta_L,delta_R)
