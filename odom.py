@@ -401,19 +401,19 @@ while not rospy.is_shutdown():
     # odometry_update(delta_L,delta_R)
     # print(x,y,th,g_x,g_y,g_theta)
 
-    if abs(delta_L - l_target) > 10:
-        l_cmd_increment = 6
+    if abs(delta_L - l_target) > 8:
+        l_cmd_increment = 7
     else:
         l_cmd_increment = 1
 
-    if abs(delta_R - r_target) > 10:
-        r_cmd_increment = 6
+    if abs(delta_R - r_target) > 8:
+        r_cmd_increment = 7
     else:
         r_cmd_increment = 1
 
     # decellerate faster if we are trying to stop
-    if l_target == 0  and  abs(delta_L - l_target) > 20 : l_cmd_increment = 10
-    if r_target == 0  and  abs(delta_R - r_target) > 20 : r_cmd_increment = 10
+    if l_target == 0  and  abs(delta_L - l_target) > 20 : l_cmd_increment = 15
+    if r_target == 0  and  abs(delta_R - r_target) > 20 : r_cmd_increment = 15
 
     if delta_L > l_target:
         l_cmd -= l_cmd_increment
