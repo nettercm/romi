@@ -28,8 +28,8 @@ print("doing imports...this could take a few seconds!")
 
 print("done with imports")
 
-a_star = AStar()
-a_star.motors(0, 0)
+romi_control_board = AStar()
+romi_control_board.motors(0, 0)
 
 PI = 3.1415926535897932384626433832795
 K_rad_to_deg = (180.0/3.1415926535897932384626433832795)
@@ -111,7 +111,7 @@ listener.start()
 
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
-    a_star.motors(0, 0)
+    romi_control_board.motors(0, 0)
     sys.exit(0)
 
 #######################################################################
@@ -274,10 +274,10 @@ def read_encoders():
 
     encoder_data_is_reliable = True
 
-    left_ticks, right_ticks = a_star.read_encoders()
-    if a_star.error:
-        left_ticks, right_ticks = a_star.read_encoders()
-        if a_star.error:
+    left_ticks, right_ticks = romi_control_board.read_encoders()
+    if romi_control_board.error:
+        left_ticks, right_ticks = romi_control_board.read_encoders()
+        if romi_control_board.error:
             print("read_encoders(): double error")
             encoder_data_is_reliable = False
 
@@ -347,8 +347,8 @@ def process_range_sensors():
 
     global ir_left,ir_front,ir_right,us_left,us_right
 
-    analog = a_star.read_analog()
-    if a_star.error: analog = a_star.read_analog()
+    analog = romi_control_board.read_analog()
+    if romi_control_board.error: analog = romi_control_board.read_analog()
  
     # convert the raw ADC readings from the Sharp IR sensors into distance in mm
     ir_left  = np.interp( analog[3], ir_near_xp, ir_near_fp ) * 25.4
@@ -474,7 +474,7 @@ last_time = rospy.Time.now()
 r = rospy.Rate(100)
 
 counter = 0
-battery = int(a_star.read_battery_millivolts())
+battery = int(romi_control_board.read_battery_millivolts())
 b = battery
 
 # initialize encoders state
@@ -591,14 +591,14 @@ while not rospy.is_shutdown():
     if r_cmd >  400: r_cmd =  400
     if r_cmd < -400: r_cmd = -400
 
-    a_star.motors(l_cmd, r_cmd)
+    romi_control_board.motors(l_cmd, r_cmd)
     # print(l_cmd,r_cmd)
 
     counter = counter+1
     if counter > 9:
         counter = 0
         time.sleep(0.0005)
-        b = a_star.read_battery_millivolts()
+        b = romi_control_board.read_battery_millivolts()
         if b > 0:
             #print("b=%5d, l_cmd=%4d, r_cmd=%4d, delta_L=%4d, delta_R=%4d, l_target=%4d, r_target=%4d x=%7.1f y=%7.1f th=%8.3f" % (int(b),l_cmd,r_cmd,delta_L,delta_R,l_target,r_target,x,y,degs(norm(th))))
             battery = (battery * 3 + b) / 4
