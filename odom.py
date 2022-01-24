@@ -402,12 +402,12 @@ while not rospy.is_shutdown():
     # print(x,y,th,g_x,g_y,g_theta)
 
     if abs(delta_L - l_target) > 10:
-        l_cmd_increment = 4
+        l_cmd_increment = 6
     else:
         l_cmd_increment = 1
 
     if abs(delta_R - r_target) > 10:
-        r_cmd_increment = 4
+        r_cmd_increment = 6
     else:
         r_cmd_increment = 1
 
