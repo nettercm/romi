@@ -68,7 +68,8 @@ speed_increment = 2
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
     romi_control_board.motors(0, 0)
-    sys.exit(0)
+    #sys.exit(0)
+    rospy.signal_shutdown("Ctrl+C")
 
 #######################################################################
 
@@ -492,3 +493,9 @@ while not rospy.is_shutdown():
             us_left, us_right))
 
     r.sleep()
+
+
+
+
+print("Exiting....")
+romi_control_board.motors(0, 0)
