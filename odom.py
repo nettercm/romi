@@ -63,50 +63,6 @@ r_cmd = 0
 
 speed_increment = 2
 
-'''
-#######################################################################
-
-from pynput import keyboard
-
-def on_press(key):
-  global l_cmd,r_cmd,l_target,r_target,speed_increment
-  #print('You pressed a key')
-  if key == keyboard.Key.up:
-    l_target += speed_increment
-    r_target += speed_increment
-  if key == keyboard.Key.down:
-    l_target -= speed_increment
-    r_target -= speed_increment
-  if key == keyboard.Key.left:
-    l_target -= speed_increment
-    r_target += speed_increment
-  if key == keyboard.Key.right:
-    l_target += speed_increment
-    r_target -= speed_increment
-  if key == keyboard.Key.space:
-    l_target = 0
-    r_target = 0
-    l_cmd = 0
-    r_cmd = 0
-  return True
-    
-#######################################################################
-    
-def on_release(key):
-    #print('You released a key')
-    if key == keyboard.Key.esc:
-      print('You pressed Esc')
-      #return False
-    return True
-
-#######################################################################
-
-print("starting keyboard listener")
-listener = keyboard.Listener( on_press=on_press, on_release=on_release )
-listener.start()
-
-
-'''
 
 
 def signal_handler(sig, frame):
@@ -116,115 +72,10 @@ def signal_handler(sig, frame):
 
 #######################################################################
 
-'''
-def debug_thread(name):
-    global g_l, g_r, g_dl, g_dr
-    while 1:
-        print(g_x, g_y, K_rad_to_deg*g_theta)
-        time.sleep(0.2)
-
-#######################################################################
-
-
-def odometry_update(l_ticks, r_ticks):
-    #  float d_theta, d_x, d_y, l, r
-    #  float d_Ul, d_Ur, d_U
-    global g_x
-    global g_y
-    global g_theta
-    global g_U
-    global g_l
-    global g_r
-    global g_dl
-    global g_dr
-
-    g_l += l_ticks
-    g_r += r_ticks
-    g_dl = l_ticks
-    g_dr = r_ticks
-
-    l = float(l_ticks)
-    r = float(r_ticks)
-
-    d_Ul = odo_cml * l
-    d_Ur = odo_cmr * r
-    d_U = (d_Ul + d_Ur) / 2.0
-    d_theta = (d_Ur - d_Ul) / odo_b
-
-    # update our absolute position
-    d_x = d_U * cos(g_theta)
-    d_y = d_U * sin(g_theta)
-    g_x = g_x + d_x
-    g_y = g_y + d_y
-    g_theta = g_theta + d_theta
-    g_U = g_U + d_U
-
-    if g_theta > 1.0*PI:
-        g_theta -= 2.0*PI
-    # if(g_theta < -2.0*PI) g_theta += 2.0*PI
-    if g_theta < -1.0*PI:
-        g_theta += 2.0*PI
-
-#######################################################################
-
-
-def speed_control_thread(name):
-    global l_cmd, r_cmd, l_target, r_target, left_total, right_total
-    left1, right1 = a_star.read_encoders()
-    while 1:
-        time.sleep(0.02)
-
-        # first let's read...
-        left2, right2 = a_star.read_encoders()
-        #analog = a_star.read_analog()
-
-        left_delta = left2-left1
-        if left_delta > 32000:
-            left_delta = 65536 - left_delta
-        if left_delta < -32000:
-            left_delta = 65536 + left_delta
-        right_delta = right2-right1
-        if right_delta > 32000:
-            right_delta = 65536 - right_delta
-        if right_delta < -32000:
-            right_delta = 65536 + right_delta
-        left_total += left_delta
-        right_total += right_delta
-        left1 = left2
-        right1 = right2
-        odometry_update(left_delta, right_delta)
-
-        if left_delta > l_target:
-            l_cmd -= 1
-        if left_delta < l_target:
-            l_cmd += 1
-        if right_delta > r_target:
-            r_cmd -= 1
-        if right_delta < r_target:
-            r_cmd += 1
-
-        # now let's write
-        a_star.motors(l_cmd, r_cmd)
-'''
-#######################################################################
-
 
 print("installing SIGINT handler")
 signal.signal(signal.SIGINT, signal_handler)
 
-"""
-print("starting debug_thread")
-t1=threading.Thread(target=debug_thread, args=(1,))
-t1.daemon=True
-t1.start()
-
-print("starting speed_control_thread")
-t2=threading.Thread(target=speed_control_thread, args=(1,))
-t2.daemon=True
-t2.start()
-
-
-"""
 
 
 #######################################################################
