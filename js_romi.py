@@ -87,11 +87,20 @@ r_speed_adjust = 0
 
 avoid_obstacles = False
 
+t_delta = 0.0
+t_last_update = time.monotonic()
+time.sleep(0.01)
+t_target = time.monotonic()
+
 while done == 0:
 
     t_update = time.monotonic()
     flags = "-"
     turning = False 
+
+    t_delta = t_update - t_last_update
+    t_last_update = t_update
+    t_delta_error = t_delta - 0.01
 
     # get all the required inputs from the romi controller
     analog = a_star.read_analog()
@@ -134,7 +143,7 @@ while done == 0:
     t = time.monotonic()
 
     y = -js.axis_states['y']    # left  joystick, up/down axis
-    rx = js.axis_states['z']   # right joystick  left/right axis
+    rx = js.axis_states['rx']   # right joystick  left/right axis   # use z for gamesir controller
 
     # convert the joystick values into linear and angular velocity up to "max_speed"
     js_linear_velocity = y * max_speed
@@ -294,11 +303,13 @@ while done == 0:
 
     # once in a while, but not too often, show what's going on
     if t > t_last_print + 0:  #0.05:
+        #if abs(t_delta_error) > 0.0002:
         #print("T=%8.4f    %-4.2f  %-4.2f   ir(adc)= %4d,  %4d,  %4d   ir = %5.0f,  %5.0f,  %5.0f   us= %4d,  %4d      %2.1f V      e=%6d,%6d    errors=%d" % (t, js.axis_states['y'],js.axis_states['rx'],    analog[3]/1,  analog[1]/1,  analog[2]/1,   ir_left, ir_front, ir_right,  analog[0]/1,  analog[4]/1,float(battery_millivolts[0])/1000.0, encoders[0], encoders[1], a_star.errors) )
         #print("%-4.2f  %-4.2f" % (js.axis_states['y'],js.axis_states['ry']) )
-        print("%8.3f,  %-6.1f, %-6.1f, %-6.1f, %-6.1f, %-6.1f   ir = %5.0f,  %5.0f,  %5.0f   us= %4d,  %4d   e = %5.1f , %5.1f  m = %-3d,%-3d   v=%3.1f    %s" % 
+        print("%8.3f,  %9.6f,  %-6.1f, %-6.1f, %-6.1f, %-6.1f, %-6.1f   ir = %5.0f,  %5.0f,  %5.0f   us= %4d,  %4d   e = %5.1f , %5.1f  m = %-3d,%-3d   v=%3.1f    %s" % 
             (
                 time.monotonic(), 
+                t_delta_error,
                 js_linear_velocity,
                 commanded_linear_velocity, 
                 commanded_angular_velocity, 
@@ -315,8 +326,9 @@ while done == 0:
 
     # run the loop at approximately 100Hz
     t_now = time.monotonic()
-    t_sleep = (t_update + 0.01) - t_now
-    t_sleep = t_sleep - 0.00004
+    t_target = t_target + 0.01
+    t_sleep = t_target - t_now
+    t_sleep = t_sleep - 0.000025
     if t_sleep > 0:
         time.sleep(t_sleep)
 
