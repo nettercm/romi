@@ -8,7 +8,7 @@ import math
 import termios
 import fcntl
 import os
-import keyboard
+#import keyboard
 from scanf import scanf
 
 from a_star import AStar
@@ -167,7 +167,7 @@ if __name__ == '__main__':
   print(sys.argv)
 
   if len(sys.argv) == 1:
-    args = "10 -10 100 100"
+    args = "10 -10 0.01 100"
   else:
     args = sys.argv[1]+" "+sys.argv[2]+" "+sys.argv[3]+" "+sys.argv[4]
 
