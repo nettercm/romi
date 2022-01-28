@@ -10,7 +10,7 @@ import tf
 
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point,Pose,Quaternion,Twist,Vector3,PointStamped
-from std_msgs.msg import Int16
+from std_msgs.msg import Int16, Float32MultiArray
 from sensor_msgs.msg import LaserScan,PointCloud2,PointCloud
 
 import sensor_msgs.point_cloud2 as pc2
@@ -80,8 +80,8 @@ def scan_callback(scan_msg : LaserScan):
     l = len(scan_msg.ranges)
     valid = 0
 
-    minimums = [99,99,99,99,99,99,99,99,99,99,99,99,99]
-    averages = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+    minimums = [99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0]
+    averages = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
 
     hz = (3.0*last_hz + (1.0 / scan_msg.scan_time)) / 4.0
     last_hz = hz
@@ -129,7 +129,9 @@ def scan_callback(scan_msg : LaserScan):
         laser_msg.header.stamp = scan_msg.header.stamp
         laser_pub[i].publish(laser_msg)
 
-
+    ranges = Float32MultiArray(data=minimums)
+    array_pub.publish(ranges)
+    
     return
 
 
@@ -155,6 +157,7 @@ laser_pub[9]  =rospy.Publisher("laser9",  Range,        queue_size=5, tcp_nodela
 laser_pub[10] =rospy.Publisher("laser10", Range,        queue_size=5, tcp_nodelay=True)
 laser_pub[11] =rospy.Publisher("laser11", Range,        queue_size=5, tcp_nodelay=True)
 
+array_pub     =rospy.Publisher("laser_array", Float32MultiArray, queue_size=5, tcp_nodelay=True)
 
 TWO_PI = 2.0 * pi
 
