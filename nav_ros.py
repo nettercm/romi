@@ -73,13 +73,16 @@ def odom_callback(msg: Odometry):
     return
 
 
+myargv = rospy.myargv(argv=sys.argv)
+print(sys.argv)
+print(myargv)
 
 # process command line parameters
 #
-if len(sys.argv) == 1:
-    args = "0 0"
+if len(myargv) == 1:
+    args = "0.0 0.0"
 else:
-    args = sys.argv[1]+" "+sys.argv[2]
+    args = myargv[1]+" "+myargv[2]
 scanf_result = scanf('%f %f',args)
 print(scanf_result)
 X_target = scanf_result[0]

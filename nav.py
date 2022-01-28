@@ -53,7 +53,7 @@ def target_acquired(distance, last_distance):
 
 def target_vector(X_position, Y_position, Theta,   X_target, Y_target):
     """
-    calculate distance bearing from target
+    calculate distance and bearing from target
     returns the tuple (distance,bearing)
     """
     x = X_target - X_position
