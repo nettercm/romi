@@ -23,7 +23,8 @@ import js_linux as js
 
 
 done = False
-
+joystick_is_idle = False
+t_idle = 0.0
 
 # catch Ctrl-C
 def signal_handler(sig, frame):
@@ -37,7 +38,7 @@ def signal_handler(sig, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
-rospy.init_node('joystick_publisher')
+rospy.init_node('joystick')
 
 joy_pub = rospy.Publisher("cmd_vel", Twist, queue_size=5, tcp_nodelay=True)
 
@@ -48,7 +49,7 @@ js.js_init()
 while (not done) and (not rospy.is_shutdown()):
 
     y =  -js.axis_states['y']    # left  joystick, up/down axis
-    rx = -js.axis_states['z']   # right joystick  left/right axis
+    rx = -js.axis_states['rx']   # right joystick  left/right axis  # use rz for gamesir controller
 
     # convert the joystick values into linear and angular velocity up to "max_speed"
     js_linear_velocity = y    * 0.7    # set max linear velocity to 0.7 meters per second
@@ -64,7 +65,21 @@ while (not done) and (not rospy.is_shutdown()):
     cmd_vel_data.linear.y =  0.0
     cmd_vel_data.linear.z =  0.0
 
-    joy_pub.publish(cmd_vel_data)
+    if joystick_is_idle == False:
+        joy_pub.publish(cmd_vel_data)   # only publish if joystick is not idle
+
+    if ( abs(js_angular_velocity) < 0.01 ) and ( abs(js_linear_velocity) < 0.01 ) and js.button_states['a']==0:
+        t_idle = t_idle + 0.05
+        if t_idle > 3.0:
+            if joystick_is_idle == False:
+                 print("joystick idle")  # print only on state change
+            joystick_is_idle = True
+    else:
+        if joystick_is_idle == True:
+            print("joystick is busy")
+        t_idle = 0.0
+        joystick_is_idle = False
+
 
     r.sleep()
 
