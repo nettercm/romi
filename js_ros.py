@@ -65,6 +65,7 @@ while (not done) and (not rospy.is_shutdown()):
     cmd_vel_data.linear.y =  0.0
     cmd_vel_data.linear.z =  0.0
 
+
     if joystick_is_idle == False:
         joy_pub.publish(cmd_vel_data)   # only publish if joystick is not idle
 
@@ -72,7 +73,7 @@ while (not done) and (not rospy.is_shutdown()):
         t_idle = t_idle + 0.05
         if t_idle > 3.0:
             if joystick_is_idle == False:
-                 print("joystick idle")  # print only on state change
+                print("joystick idle")  # print only on state change
             joystick_is_idle = True
     else:
         if joystick_is_idle == True:
@@ -80,6 +81,12 @@ while (not done) and (not rospy.is_shutdown()):
         t_idle = 0.0
         joystick_is_idle = False
 
+    #if 'b' is pressed (which os the O on the PS3 controller), immediately go idle
+    if js.button_states['b']==1:
+        if joystick_is_idle == False:
+            print("joystick idle")  # print only on state change
+        joystick_is_idle = True
+        
 
     r.sleep()
 
