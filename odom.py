@@ -403,18 +403,18 @@ while not rospy.is_shutdown():
     # print(x,y,th,g_x,g_y,g_theta)
 
     if abs(delta_L - l_target) > 8:
-        l_cmd_increment = 7
+        l_cmd_increment = 6
     else:
         l_cmd_increment = 1
 
     if abs(delta_R - r_target) > 8:
-        r_cmd_increment = 7
+        r_cmd_increment = 6
     else:
         r_cmd_increment = 1
 
     # decellerate faster if we are trying to stop
-    if l_target == 0  and  abs(delta_L - l_target) > 20 : l_cmd_increment = 15
-    if r_target == 0  and  abs(delta_R - r_target) > 20 : r_cmd_increment = 15
+    if l_target == 0  and  abs(delta_L - l_target) > 20 : l_cmd_increment = 12
+    if r_target == 0  and  abs(delta_R - r_target) > 20 : r_cmd_increment = 12
 
     if delta_L > l_target:
         l_cmd -= l_cmd_increment
