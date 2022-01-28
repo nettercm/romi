@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 from a_star import AStar
 import time
@@ -293,7 +294,7 @@ t2.start();
 """
 
 
-def odometry_update(left_ticks, right_ticks):
+def odometry_update(left_ticks, right_ticks, delta_T = 0.01):
     global last_left_ticks, last_right_ticks
 
     delta_L = left_ticks - last_left_ticks
@@ -310,7 +311,7 @@ def odometry_update(left_ticks, right_ticks):
     if delta_R < -32000:
         delta_R = 65536 + delta_R
 
-    odometry_update_v2(delta_L, delta_R)
+    odometry_update_v2(delta_L, delta_R, delta_T)
 
     return delta_L, delta_R
 
