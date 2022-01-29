@@ -32,6 +32,19 @@ def signal_handler(sig, frame):
     # set the flag....
     done = True
 
+
+
+def odom_reset_callback(msg: Int32):
+    print("odom reset!")
+    # TODO:  should really call an API provided by the qtpy module instead of accessing its variables....
+    qtpy.heading_calib = 0.0
+    qtpy.heading_delta_calib_accumulated = 0.0
+    qtpy.dps = 0.0
+    qtpy.dps_max = 0.0
+    return
+
+
+
 # catch Ctrl-C
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -40,6 +53,8 @@ rospy.init_node('qtpy_publisher')
 
 imu_pub = rospy.Publisher("imu", PointStamped, queue_size=5, tcp_nodelay=True)
 line_pub = rospy.Publisher("line", Int32MultiArray, queue_size=5, tcp_nodelay=True)
+
+reset_sub =  rospy.Subscriber("odom_reset",     Int32,  odom_reset_callback,     tcp_nodelay=True)
 
 current_time = last_time = rospy.Time.now()
 

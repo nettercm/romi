@@ -279,6 +279,18 @@ def process_range_sensors():
 
 
 
+def odom_reset_callback(msg: Int32):
+    print("odom reset!")
+    # TODO:  should really call an API provided by the odometry module instead of accessing its variables....
+    odometry.x = 0.0
+    odometry.y = 0.0
+    odometry.th = 0.0
+    odometry.vx = 0.0
+    odometry.vy = 0.0
+    odometry.vth = 0.0
+    return
+
+
 
 print("entering loop")
 
@@ -319,6 +331,7 @@ ir_right_pub =rospy.Publisher("ir_right", Range,        queue_size=5, tcp_nodela
 
 cmd_vel_sub = rospy.Subscriber("cmd_vel", Twist,        cmd_vel_callback, tcp_nodelay=True)
 imu_sub =     rospy.Subscriber("imu",     PointStamped, imu_callback,     tcp_nodelay=True)
+reset_sub =   rospy.Subscriber("odom_reset",     Int32,  odom_reset_callback,     tcp_nodelay=True)
 
 current_time = rospy.Time.now()
 last_time = rospy.Time.now()
