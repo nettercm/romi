@@ -28,18 +28,27 @@ joystick_is_idle = False
 t_idle = 0.0
 
 
-idle_timeout = 3.0           
-r.params.add("idle_timeout", r.double_t, 0, "joystick goes idle after this amount of inactivity",    3.0, 0.0,   10.0)
+max_linear_velocity = 0.7
+r.params.add("max_linear_velocity", r.double_t, 0, "maximum linear velocity that will be published",    0.7, 0.0,   1.0)
+
+max_angular_velocity = 6.28
+r.params.add("max_angular_velocity", r.double_t, 0, "maximum angular velocity that will be published",    6.28, 0.0,   12.58)
 
 auto_idle = True
 r.params.add("auto_idle", r.bool_t, 0, "joystick automatically goes idel after some time if this is True",   True)
 
+idle_timeout = 3.0           
+r.params.add("idle_timeout", r.double_t, 0, "joystick goes idle after this amount of inactivity",    3.0, 0.0,   10.0)
+
+
 
 def config_callback(config, level):
-    global idle_timeout, auto_idle
+    global idle_timeout, auto_idle, max_linear_velocity, max_angular_velocity
 
-    idle_timeout = config['idle_timeout']
-    auto_idle    = config['auto_idle']
+    idle_timeout            = config['idle_timeout']
+    auto_idle               = config['auto_idle']
+    max_linear_velocity     = config['max_linear_velocity']
+    max_angular_velocity    = config['max_angular_velocity']
     
     return config # not sure why this is done - that's what the example did.....
 
@@ -73,8 +82,8 @@ while (not done) and (not rospy.is_shutdown()):
     rx = -js.axis_states['rx']   # right joystick  left/right axis  # use rz for gamesir controller
 
     # convert the joystick values into linear and angular velocity up to "max_speed"
-    js_linear_velocity = y    * 0.7    # set max linear velocity to 0.7 meters per second
-    js_angular_velocity = rx  * 6.28   # set max angular velocity to 360 degrees per second
+    js_linear_velocity = y    * max_linear_velocity    # set max linear velocity to 0.7 meters per second
+    js_angular_velocity = rx  * max_angular_velocity   # set max angular velocity to 360 degrees per second
 
     cmd_vel_data = Twist()
 
