@@ -21,10 +21,29 @@ from std_msgs.msg import Int16, Int32, Int32MultiArray
 # "driver"
 import js_linux as js
 
+import reconfiguration as r
 
 done = False
 joystick_is_idle = False
 t_idle = 0.0
+
+
+idle_timeout = 3.0           
+r.params.add("idle_timeout", r.double_t, 0, "joystick goes idle after this amount of inactivity",    3.0, 0.0,   10.0)
+
+auto_idle = True
+r.params.add("auto_idle", r.bool_t, 0, "joystick automatically goes idel after some time if this is True",   True)
+
+
+def config_callback(config, level):
+    global idle_timeout, auto_idle
+
+    idle_timeout = config['idle_timeout']
+    auto_idle    = config['auto_idle']
+    
+    return config # not sure why this is done - that's what the example did.....
+
+
 
 # catch Ctrl-C
 def signal_handler(sig, frame):
@@ -42,9 +61,11 @@ rospy.init_node('joystick')
 
 joy_pub = rospy.Publisher("cmd_vel", Twist, queue_size=5, tcp_nodelay=True)
 
-r = rospy.Rate(20)
+rate = rospy.Rate(20)
 
 js.js_init()
+
+r.start(config_callback)
 
 while (not done) and (not rospy.is_shutdown()):
 
@@ -71,7 +92,7 @@ while (not done) and (not rospy.is_shutdown()):
 
     if ( abs(js_angular_velocity) < 0.01 ) and ( abs(js_linear_velocity) < 0.01 ) and js.button_states['a']==0:
         t_idle = t_idle + 0.05
-        if t_idle > 3.0:
+        if (t_idle > idle_timeout) and (auto_idle):
             if joystick_is_idle == False:
                 print("joystick idle")  # print only on state change
             joystick_is_idle = True
@@ -88,7 +109,7 @@ while (not done) and (not rospy.is_shutdown()):
         joystick_is_idle = True
         
 
-    r.sleep()
+    rate.sleep()
 
 
 
