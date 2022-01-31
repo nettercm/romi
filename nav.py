@@ -3,11 +3,12 @@
 from math import sqrt, atan2, pi
 #from turtle import radians
 
-ERR_CIRCLE = 0.013  #2.5cm == 1 inch
-DEADZONE = 0.052  #3 degrees  # not used anymore
-DOWNRAMP = 0.25
-nav_angular_speed = 2.9
-nav_linear_speed = 0.3
+error_circle       = 0.013  
+downramp           = 0.25
+angular_speed      = 2.9
+linear_speed       = 0.3
+bearing_threashold = 80.0       # if bearing is off by more than that, we steer hard and slow way way down
+slow_down_factor   = 0.1
 
 
 last_distance = 0.0
@@ -43,7 +44,7 @@ def target_acquired(distance, last_distance):
     """
     # if we are inside the error circle, but error is improving, keep going
     # but if we are inside the error circle and we are getting further away, we have reached
-    if distance < ERR_CIRCLE and (distance+0.001) > last_distance:
+    if distance < error_circle and (distance+0.001) > last_distance:
         return True
     else:
         return False
@@ -96,19 +97,19 @@ def navigate_target(X_position, Y_position, Theta, X_target,Y_target):
         #    commanded_angular_speed = -nav_angular_speed
 
     # if bearing is off by >80 degrees, steer hard, otherwise, steer proportionally based on how far off we are
-    if abs(bearing) > rads(80):
-        commanded_angular_speed = sign(bearing) * nav_angular_speed
-        linear_speed_factor = 0.1
+    if abs(bearing) > rads(bearing_threashold):
+        commanded_angular_speed = sign(bearing) * angular_speed
+        linear_speed_factor = slow_down_factor
     else:
-        commanded_angular_speed = (bearing / rads(80)) * nav_angular_speed
+        commanded_angular_speed = (bearing / rads(bearing_threashold)) * angular_speed
         linear_speed_factor = 1.0
 
     # as we get closer to the target, slow down more and more
     # example: half way between DOWNRAMP and actual target, commanded linear speed will be only 50% of full speed  ( e.g. 0.1 / 0.2 = 0.5 )
-    if distance < DOWNRAMP:
-        commanded_linear_speed = nav_linear_speed * (distance / DOWNRAMP)
+    if distance < downramp:
+        commanded_linear_speed = linear_speed * (distance / downramp)
     else:
-        commanded_linear_speed = nav_linear_speed
+        commanded_linear_speed = linear_speed
 
     # apply the speed adjustment factor 
     commanded_linear_speed = commanded_linear_speed * linear_speed_factor

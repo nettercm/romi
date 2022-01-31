@@ -24,6 +24,41 @@ import numpy as np
 import nav
 from scanf import scanf
 
+import reconfiguration as r
+
+nav.downramp = 0.25
+r.params.add("downramp", r.double_t, 0, "distance from target at which we start to ramp speed down",    .25, 0.0,   1.0)
+
+nav.angular_speed = 2.9
+r.params.add("angular_speed", r.double_t, 0, "max navigation turn rate",    2.9,  0.0,   6.28)
+
+nav.linear_speed = 0.3
+r.params.add("linear_speed", r.double_t, 0, "max navigation linear speed",    0.3,  0.0,   1.0)
+
+nav.error_circle = 0.013
+r.params.add("error_circle", r.double_t, 0, "error circle - how close do we need to be to the target?",    0.013,  0.01,   0.2)
+
+nav.bearing_threashold = 80.0    
+r.params.add("bearing_threashold", r.double_t, 0, "if bearing is off by more than that, we steer hard and slow way way down",    80.0,  0.0,   120.0)
+
+nav.slow_down_factor   = 0.1
+r.params.add("slow_down_factor", r.double_t, 0, "if bearing is way off, we slow down by this factor",    0.1,  0.0,   1.0)
+
+
+
+def config_callback(config, level):
+
+    nav.downramp            = config['downramp']
+    nav.angular_speed       = config['angular_speed']
+    nav.linear_speed        = config['linear_speed']
+    nav.error_circle        = config['error_circle']
+    nav.bearing_threashold  = config['bearing_threashold']
+    nav.slow_down_factor    = config['slow_down_factor']
+
+    return config # not sure why this is done - that's what the example did.....
+
+
+
 print("%11.3f" % (time.monotonic()))  # print some time stamps for profiling purposes
 
 '''
@@ -96,7 +131,7 @@ rospy.init_node('navigate',disable_signals=True)
 odom_sub = rospy.Subscriber("odom", Odometry,        odom_callback, tcp_nodelay=True)
 cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=5, tcp_nodelay=True)
 cmd_vel_data = Twist()
-r = rospy.Rate(20)  # loop rate of 20Hz seems sufficient
+rate = rospy.Rate(20)  # loop rate of 20Hz seems sufficient
 
 
 #wait for odometry input to start arriving....otherwise we don't know our current position
@@ -108,7 +143,7 @@ while (not odometry_ready) and (not done):
         break
 print("%11.3f    Odometry is ready...."% (time.monotonic()))
 
-
+r.start(config_callback)
 
 while (not rospy.is_shutdown()) and (not done):
 
@@ -138,7 +173,7 @@ while (not rospy.is_shutdown()) and (not done):
 
     # basically a sleep(), but done in such a way that we maintain the desired loop rate,
     # regardless of how long the body of the loop took to execute
-    r.sleep()
+    rate.sleep()
 
 
 cmd_vel_data.angular.x = 0.0
