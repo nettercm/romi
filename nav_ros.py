@@ -92,7 +92,7 @@ Y_target = scanf_result[1]
 
 # initialize all that ROS stuff....
 #
-rospy.init_node('nav',disable_signals=True)
+rospy.init_node('navigate',disable_signals=True)
 odom_sub = rospy.Subscriber("odom", Odometry,        odom_callback, tcp_nodelay=True)
 cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=5, tcp_nodelay=True)
 cmd_vel_data = Twist()
