@@ -26,6 +26,25 @@ print("doing imports...this could take a few seconds!")
 
 #from odometry import odometry_update_v2
 
+
+#################################################################################################################################
+
+import reconfiguration as r
+
+decelleration_factor = 0.2
+r.params.add("decelleration_factor", r.double_t, 0, "decelleration factor",    0.2, 0,   1.0)
+
+
+def config_callback(config, level):
+    global decelleration_factor
+
+    decelleration_factor     = config['decelleration_factor']
+
+    return config # not sure why this is done - that's what the example did.....
+
+#################################################################################################################################
+
+
 print("done with imports")
 
 romi_control_board = AStar()
@@ -336,7 +355,7 @@ reset_sub =   rospy.Subscriber("odom_reset",     Int32,  odom_reset_callback,   
 current_time = rospy.Time.now()
 last_time = rospy.Time.now()
 
-r = rospy.Rate(100)
+rate = rospy.Rate(100)
 
 counter = 0
 battery = int(romi_control_board.read_battery_millivolts())
@@ -348,6 +367,8 @@ last_left_ticks = left_ticks
 last_right_ticks = right_ticks
 
 t_last_range_sensor_update = time.monotonic()
+
+r.start(config_callback)
 
 while not rospy.is_shutdown():
 
@@ -426,8 +447,8 @@ while not rospy.is_shutdown():
         r_cmd_increment = 1
 
     # decellerate faster if we are trying to stop
-    if l_target == 0  and  abs(delta_L - l_target) > 20 : l_cmd_increment = 10
-    if r_target == 0  and  abs(delta_R - r_target) > 20 : r_cmd_increment = 10
+    if l_target == 0:  l_cmd_increment  = int( abs(delta_L - l_target) * decelleration_factor + 0.5 )  # round up...
+    if r_target == 0:  r_cmd_increment  = int( abs(delta_R - r_target) * decelleration_factor + 0.5 )  # round up...
 
     if delta_L > l_target:
         l_cmd -= l_cmd_increment
@@ -505,7 +526,7 @@ while not rospy.is_shutdown():
             odometry.x, odometry.y, degs(norm(odometry.th)),odometry.th,
             us_left, us_right))
 
-    r.sleep()
+    rate.sleep()
 
 
 
