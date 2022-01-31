@@ -18,6 +18,19 @@ import laser_geometry.laser_geometry as lg
 
 from sensor_msgs.msg import Range
 
+import reconfiguration as r
+
+
+use_minimums = True
+r.params.add("use_minimums", r.bool_t, 0, "If true, use the minimum reading as the final value. If false, use the average",   True)
+
+
+def config_callback(config, level):
+    global use_minimums
+    use_minimums            = config['use_minimums']
+    return config # not sure why this is done - that's what the example did.....
+
+
 
 def rads(degrees):
     """
@@ -118,18 +131,24 @@ def scan_callback(scan_msg : LaserScan):
 
     averages[12] = averages[0]
     minimums[12] = minimums[0]
+
+    if use_minimums:
+        values = minimums
+    else:
+        values = averages
+        
     laser_msg = Range()
     for i in range(0,12):
         laser_msg.radiation_type = Range.INFRARED
         laser_msg.field_of_view = 0.523599  # 30 degrees
         laser_msg.max_range = 9.0
         laser_msg.min_range = 0.14
-        laser_msg.range = minimums[12-i]
+        laser_msg.range = values[12-i]
         laser_msg.header.frame_id = frame_id[i]
         laser_msg.header.stamp = scan_msg.header.stamp
         laser_pub[i].publish(laser_msg)
 
-    ranges = Float32MultiArray(data=minimums)
+    ranges = Float32MultiArray(data=values)
     array_pub.publish(ranges)
     
     return
@@ -164,7 +183,7 @@ TWO_PI = 2.0 * pi
 start_time = rospy.Duration(0)
 time_offset = rospy.Time.now()
 
-
+r.start(config_callback)
 
 while not rospy.is_shutdown():
     rospy.spin()
