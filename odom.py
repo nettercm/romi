@@ -312,6 +312,7 @@ rospy.init_node('romi_control_board_publisher')
 odom_broadcaster = tf.TransformBroadcaster()
 
 odom_pub =    rospy.Publisher("odom",     Odometry,     queue_size=20, tcp_nodelay=True)
+odom_slow_pub=rospy.Publisher("odom_slow",Odometry,     queue_size=5, tcp_nodelay=True)     # odometry but at a much reduced update rate
 encoders_pub =rospy.Publisher("encoders", PointStamped, queue_size=20, tcp_nodelay=True)
 battery_pub = rospy.Publisher("battery",  Int32,        queue_size=20, tcp_nodelay=True)
 
@@ -341,6 +342,8 @@ last_left_ticks = left_ticks
 last_right_ticks = right_ticks
 
 t_last_range_sensor_update = time.monotonic()
+
+t_last_odom_slow_update = time.monotonic()
 
 r.start(config_callback)
 
@@ -396,6 +399,11 @@ while not rospy.is_shutdown():
         Vector3(odometry.vx, odometry.vy, 0), Vector3(0, 0, odometry.vth))
 
     odom_pub.publish(odom)
+
+    if t >= t_last_odom_slow_update + 0.049:   # 20Hz
+        t_last_odom_slow_update = t
+        odom_slow_pub.publish(odom)
+
 
     # now publish the raw encoder data - just in case we need it
     # later when playing back a rosbag
