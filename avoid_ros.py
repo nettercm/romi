@@ -20,6 +20,8 @@ from sensor_msgs.msg import LaserScan,PointCloud2,PointCloud
 
 from utilities import *
 
+import avoid
+
 #############################################  Parameter stuff....  #####################################################
 
 import reconfiguration as r
@@ -60,33 +62,21 @@ def signal_handler(sig, frame):
 
 
 
-def avoid():
-    global r
-    #print(ranges)
-    #front = min(r[0],r[1],r[2],r[11],r[10])
-    front = min(r[0],r[1],r[11])
-    left = min(r[2],r[3])
-    right = min(r[10],r[9])
+def do_avoid(r):
 
     cmd_vel_data = Twist()
 
     cmd_vel_data.angular.x = 0.0
     cmd_vel_data.angular.y = 0.0
 
-    cmd_vel_data.linear.x =  0.1
+    cmd_vel_data.linear.x =  0.0
     cmd_vel_data.linear.y =  0.0
     cmd_vel_data.linear.z =  0.0
 
-    print("%5.3f  %5.3f  %5.3f      %4.2f %4.2f    %4.2f %4.2f %4.2f    %4.2f %4.2f" % (left,front,right,  r[3],r[2],r[1],r[0],r[11],r[10],r[9]))
-    
-    if (front < th):  #or (left < th) or (right < th):
-        if left <= right:
-            print("turn right")
-            cmd_vel_data.angular.z = -3.0
-        else: #elif right < front:
-            print("turn left")
-            cmd_vel_data.angular.z = 3.0
-
+    result =  avoid.avoid_behavior(r)
+    if result != None:
+        cmd_vel_data.angular.z = result[1]
+        cmd_vel_data.linear.x = result[0]
         cmd_vel_pub.publish(cmd_vel_data)
     
     return
@@ -97,7 +87,7 @@ def laser_callback(msg : Float32MultiArray):
     global r
 
     r = msg.data
-    avoid()
+    do_avoid(r)
 
     return
 
@@ -119,7 +109,7 @@ last_time = rospy.Time.now()
 
 rate = rospy.Rate(10)
 
-th = 0.3
+avoid.th = 0.3
 
 while not rospy.is_shutdown():
 
