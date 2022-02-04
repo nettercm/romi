@@ -23,9 +23,14 @@ import js_linux as js
 
 import reconfiguration as r
 
+from utilities import *
+
 done = False
 joystick_is_idle = False
 t_idle = 0.0
+
+current_vth = 0.0
+current_vx  = 0.0
 
 
 max_linear_velocity = 0.7
@@ -33,6 +38,12 @@ r.params.add("max_linear_velocity", r.double_t, 0, "maximum linear velocity that
 
 max_angular_velocity = 6.28
 r.params.add("max_angular_velocity", r.double_t, 0, "maximum angular velocity that will be published",    6.28, 0.0,   12.58)
+
+linear_velocity_slew_rate = 1.0
+r.params.add("linear_velocity_slew_rate", r.double_t, 0, "linear_velocity_slew_rate",    1.0, 0.0,   1.0)
+
+angular_velocity_slew_rate = 6.28
+r.params.add("angular_velocity_slew_rate", r.double_t, 0, "angular_velocity_slew_rate",    6.28, 0.0,   12.58)
 
 auto_idle = True
 r.params.add("auto_idle", r.bool_t, 0, "joystick automatically goes idel after some time if this is True",   True)
@@ -54,6 +65,12 @@ def config_callback(config, level):
 
 
 
+def odom_callback(msg : Odometry):
+    global current_vx, current_vth
+    current_vx = msg.twist.twist.linear.x
+    current_vth= msg.twist.twist.angular.z
+    return
+
 # catch Ctrl-C
 def signal_handler(sig, frame):
     global done
@@ -69,6 +86,8 @@ signal.signal(signal.SIGINT, signal_handler)
 rospy.init_node('joystick')
 
 joy_pub = rospy.Publisher("cmd_vel", Twist, queue_size=5, tcp_nodelay=True)
+
+odom_sub= rospy.Subscriber("odom_slow",     Odometry, odom_callback,     tcp_nodelay=True)
 
 rate = rospy.Rate(20)
 
@@ -89,9 +108,9 @@ while (not done) and (not rospy.is_shutdown()):
 
     cmd_vel_data.angular.x = 0.0
     cmd_vel_data.angular.y = 0.0
-    cmd_vel_data.angular.z = js_angular_velocity 
-
-    cmd_vel_data.linear.x =  js_linear_velocity
+    cmd_vel_data.angular.z = slew(current_vth, js_angular_velocity, angular_velocity_slew_rate) 
+ 
+    cmd_vel_data.linear.x =  slew(current_vx , js_linear_velocity, linear_velocity_slew_rate)
     cmd_vel_data.linear.y =  0.0
     cmd_vel_data.linear.z =  0.0
 

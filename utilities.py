@@ -67,3 +67,16 @@ def norm(theta):
     return normalized
 
 
+
+def slew( f:float, t:float, r:float ):  # from, to, rate
+    """
+    ramp a value (e.g. speed) up or down at a specific rate
+    """
+    difference = t - f
+    if difference > r:
+        return f + r
+    if difference < -r:
+        return f - r
+    
+    #default case:
+    return t
