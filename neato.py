@@ -12,6 +12,8 @@ import os
 import js_linux as js
 import statistics 
 
+from utilities import *
+
 # the following are just for documentation purposes
 get_analog_sensors_response  = b'getanalogsensors\r\nSensorName,Unit,Value\r\nBatteryVoltage,mV,13050,\r\nBatteryCurrent,mA,-92,\r\nBatteryTemperature,mC,26297,\r\nExternalVoltage,mV,687,\r\nAccelerometerX,mG,33,\r\nAccelerometerY,mG,25,\r\nAccelerometerZ,mG,961,\r\nVacuumCurrent,mA,0,\r\nSideBrushCurrent,mA,0,\r\nMagSensorLeft,VAL,0,\r\nMagSensorRight,VAL,0,\r\nWallSensor,mm,70,\r\nDropSensorLeft,mm,0,\r\nDropSensorRight,mm,0,\r\n\x1a'
 get_digital_sensors_response = b'getdigitalsensors\r\nDigital Sensor Name, Value\r\nSNSR_DC_JACK_IS_IN,0\r\nSNSR_DUSTBIN_IS_IN,0\r\nSNSR_LEFT_WHEEL_EXTENDED,1\r\nSNSR_RIGHT_WHEEL_EXTENDED,1\r\nLSIDEBIT,0\r\nLFRONTBIT,0\r\nLLDSBIT,0\r\nRSIDEBIT,0\r\nRFRONTBIT,0\r\nRLDSBIT,0\r\n\x1a'
@@ -28,13 +30,6 @@ done = False
 
 js.js_init()
 
-
-
-def sign(x):
-    if x >= 0:
-        return 1
-    else:
-        return -1
 
 
 #send a command (terminated via \n) and wait for the response (which is terminated with 0x1a)

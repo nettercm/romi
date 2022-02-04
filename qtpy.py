@@ -6,6 +6,7 @@ import time
 import serial
 import signal
 
+from utilities import *
 
 done = False
 
@@ -17,8 +18,6 @@ def signal_handler(sig, frame):
     # sys.exit(0)
     done = True
 
-
-def sign(x): return math.copysign(1, x)
 
 
 heading_uncal_old = 0.0
@@ -53,22 +52,6 @@ timestamp = 0
 line = [0,0,0,0,0,0,0,0]
 
 
-def between(x_min, x, x_max):
-    if (x >= x_min) and (x <= x_max):
-        return True
-    else:
-        return False
-
-
-def th_delta(th_old, th_new):
-    if (abs(th_new) > 170.0) and (sign(th_old) != sign(th_new)):
-        if sign(th_new) > 0:
-            # clockwise
-            return -1.0 * ((180.0 - abs(th_old)) + (180.0 - th_new))
-        else:
-            return +1.0 * ((180.0 - th_old) + (180.0 - abs(th_new)))
-    else:
-        return th_new - th_old
 
 
 def initialize():

@@ -3,6 +3,8 @@
 from math import sqrt, atan2, pi
 #from turtle import radians
 
+from utilities import *
+
 error_circle       = 0.013  
 downramp           = 0.25
 angular_speed      = 2.9
@@ -15,27 +17,6 @@ last_distance = 0.0
 debug = True
 
 
-
-def rads(degrees):
-    """
-    convert from degrees to radians
-    """
-    return degrees * pi / 180.0
-
-
-
-
-def sign(x):
-    """
-    return -1 if the input was negative, +1 otherwise.
-    There probably is a library function for this, but I couldn't find it...
-    """
-    if x < 0:
-        return -1
-    else:
-        return 1
-
-        
 
 
 def target_acquired(distance, last_distance):

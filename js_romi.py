@@ -13,6 +13,8 @@ import js_linux as js
 import numpy as np
 import statistics 
 
+from utilities import *
+
 #from math import cos,sin,pi
 #from pynput import keyboard
 
@@ -34,10 +36,6 @@ def signal_handler(sig, frame):
     a_star.motors(0, 0)
     sys.exit(0)
 
-
-def sign(x):
-    if x >= 0: return 1
-    return -1
 
 
 print("installing SIGINT handler")

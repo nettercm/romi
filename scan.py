@@ -7,16 +7,15 @@ from math import cos,sin,pi
 
 import rospy
 import tf
-
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point,Pose,Quaternion,Twist,Vector3,PointStamped
 from std_msgs.msg import Int16, Float32MultiArray
 from sensor_msgs.msg import LaserScan,PointCloud2,PointCloud
-
 import sensor_msgs.point_cloud2 as pc2
 import laser_geometry.laser_geometry as lg
-
 from sensor_msgs.msg import Range
+
+from utilities import *
 
 import reconfiguration as r
 
@@ -31,33 +30,6 @@ def config_callback(config, level):
     return config # not sure why this is done - that's what the example did.....
 
 
-
-def rads(degrees):
-    """
-    convert from degrees to radians
-    """
-    return degrees * pi / 180.0
-
-
-
-def degs(radians):
-    """
-    convert from radians to degrees
-    """
-    return radians * 180 / pi
-
-
-
-def norm(theta):
-    """
-    normalize the angle theta so that it always falls between -pi and +pi
-    """
-    TWO_PI = 2.0 * pi
-    normalized = theta % TWO_PI;
-    normalized = (normalized + TWO_PI) % TWO_PI;
-    if normalized > pi:
-        normalized = normalized - TWO_PI;
-    return normalized
 
 
 

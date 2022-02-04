@@ -16,6 +16,7 @@ try:
 except:
     print("unable to import pynput")
 
+from utilities import *
 
 a_star = None
 
@@ -208,31 +209,6 @@ def speed_control_thread(name):
 
 #######################################################################
 
-
-def rads(degrees):
-    """
-    convert from degrees to radians
-    """
-    return degrees * pi / 180.0
-
-
-def degs(radians):
-    """
-    convert from radians to degrees
-    """
-    return radians * 180 / pi
-
-
-def norm(theta):
-    """
-    normalize the angle theta so that it always falls between -pi and +pi
-    """
-    TWO_PI = 2.0 * pi
-    normalized = theta % TWO_PI
-    normalized = (normalized + TWO_PI) % TWO_PI
-    if normalized > pi:
-        normalized = normalized - TWO_PI
-    return normalized
 
 
 def odometry_update_v2(delta_L, delta_R, delta_T):

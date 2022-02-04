@@ -5,6 +5,8 @@ from time import sleep
 from math import pi
 from lsm6ds33 import LSM6DS33
 
+from utilities import *
+
 imu = None
 x_offset = 0.0
 y_offset = 0.0
@@ -27,34 +29,6 @@ update_counter = 0
 raw = None
 
 done = False
-
-
-def rads(degrees):
-    """
-    convert from degrees to radians
-    """
-    return degrees * pi / 180.0
-
-
-
-def degs(radians):
-    """
-    convert from radians to degrees
-    """
-    return radians * 180 / pi
-
-
-
-def norm(theta):
-    """
-    normalize the angle theta so that it always falls between -pi and +pi
-    """
-    TWO_PI = 2.0 * pi
-    normalized = theta % TWO_PI;
-    normalized = (normalized + TWO_PI) % TWO_PI;
-    if normalized > pi:
-        normalized = normalized - TWO_PI;
-    return normalized
 
 
 #if the data is ready, the following takes ~850us  (getStatus = 120us,   getGyroscopeRaw = 725us

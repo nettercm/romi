@@ -18,7 +18,7 @@ from geometry_msgs.msg import Point,Pose,Quaternion,Twist,Vector3,PointStamped
 from std_msgs.msg import Int16, Float32MultiArray
 from sensor_msgs.msg import LaserScan,PointCloud2,PointCloud
 
-
+from utilities import *
 
 #############################################  Parameter stuff....  #####################################################
 
@@ -57,11 +57,6 @@ def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
     done = 1
     time.sleep(0.1)
-
-
-def sign(x):
-    if x >= 0: return 1
-    return -1
 
 
 
