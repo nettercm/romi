@@ -269,6 +269,9 @@ def odometry_update_v2(delta_L, delta_R, delta_T):
     y += dy
     th = (th+dth) % (2 * pi)
 
+    vx_old = vx
+    vth_old = vth
+
     if dt > 0:
         vx = dc/dt  # dx/dt
         vy = 0.0    # dy/dt
@@ -277,6 +280,9 @@ def odometry_update_v2(delta_L, delta_R, delta_T):
         vx = 0
         vy = 0
         vth = 0
+
+    vth= (vth_old*7.0  + vth) / 8.0  # smothing
+    vx = (vx_old *7.0  + vx ) / 8.0  # smothing
 
 
 """
