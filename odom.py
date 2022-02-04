@@ -31,19 +31,21 @@ print("doing imports...this could take a few seconds!")
 
 import reconfiguration as r
 
-decelleration_factor = 0.2
-r.params.add("decelleration_factor", r.double_t, 0, "decelleration factor",    0.2, 0,   1.0)
+decelleration_factor = 0.25
+r.params.add("decelleration_factor", r.double_t, 0, "decelleration factor used specifically when stopping, i.e. target speed = 0",    0.25, 0,   1.0)
 
+accellertion_factor = 0.15
+r.params.add("accellertion_factor", r.double_t, 0, "accellertion factor",    0.15, 0,   1.0)
 
 def config_callback(config, level):
-    global decelleration_factor
+    global decelleration_factor, accellertion_factor
 
-    decelleration_factor     = config['decelleration_factor']
+    decelleration_factor    = config['decelleration_factor']
+    accellertion_factor     = config['accellertion_factor']
 
     return config # not sure why this is done - that's what the example did.....
 
 #################################################################################################################################
-
 
 print("done with imports")
 
@@ -74,11 +76,14 @@ encoder_data_is_reliable = True
 
 left_total = 0
 right_total = 0
-l_target = 0  # left wheel target speed - in encoder ticks per 10ms
-r_target = 0
-l_cmd = 0
-r_cmd = 0
 
+l_target = 0  # left wheel target speed - in encoder ticks per 10ms
+r_target = 0  # right wheel target speed - in encoder ticks per 10ms
+vx_target = 0.0    # target linear velocity - this comes straight from the /cmd_vel input
+vth_target = 0.0   # target angular velocity - this comes straight from the /cmd_vel input
+
+l_cmd = 0 # this is what we are sending to th emotor controller -400.....400
+r_cmd = 0 # this is what we are sending to th emotor controller -400.....400
 
 speed_increment = 2
 
@@ -184,12 +189,14 @@ def cmd_vel_callback(msg):
     The cmd_vel_callback() gets called every time a new message of type /cmd_vel is received.
     We simply convirt it into target speed for left and right wheel
     """
-    global l_cmd, r_cmd, l_target, r_target
+    global vx_target, vth_target, l_target, r_target
     #rospy.loginfo("Received a /cmd_vel message!")
     #rospy.loginfo("Linear Components: [%f, %f, %f]"%(msg.linear.x, msg.linear.y, msg.linear.z))
     #rospy.loginfo("Angular Components: [%f, %f, %f]"%(msg.angular.x, msg.angular.y, msg.angular.z))
-    l_target = int((msg.linear.x - msg.angular.z/14) * 68)
-    r_target = int((msg.linear.x + msg.angular.z/14) * 68)
+    l_target = int((msg.linear.x - msg.angular.z/14) * 68)  # convert from m/sec & rads/sec into encoder ticks per 10ms
+    r_target = int((msg.linear.x + msg.angular.z/14) * 68)  # convert from m/sec & rads/sec into encoder ticks per 10ms
+    vx_target = msg.linear.x
+    vth_target= msg.angular.z
 
 
 #######################################################################
@@ -394,6 +401,7 @@ while not rospy.is_shutdown():
     #    continue
 
     delta_T = (current_time - last_time).to_sec()
+    #delta_T = 0.01  # we expect this to run at 100Hz....
 
     odometry.odometry_update_v2(delta_L, delta_R, delta_T)
 
@@ -436,6 +444,7 @@ while not rospy.is_shutdown():
     # odometry_update(delta_L,delta_R)
     # print(x,y,th,g_x,g_y,g_theta)
 
+    '''
     if abs(delta_L - l_target) > 8:
         l_cmd_increment = 6
     else:
@@ -445,6 +454,9 @@ while not rospy.is_shutdown():
         r_cmd_increment = 6
     else:
         r_cmd_increment = 1
+    '''
+    l_cmd_increment = int( abs(delta_L - l_target) * accellertion_factor + 0.5 )
+    r_cmd_increment = int( abs(delta_R - r_target) * accellertion_factor + 0.5 )
 
     # decellerate faster if we are trying to stop
     if l_target == 0:  l_cmd_increment  = int( abs(delta_L - l_target) * decelleration_factor + 0.5 )  # round up...
