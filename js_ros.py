@@ -54,12 +54,15 @@ r.params.add("idle_timeout", r.double_t, 0, "joystick goes idle after this amoun
 
 
 def config_callback(config, level):
-    global idle_timeout, auto_idle, max_linear_velocity, max_angular_velocity
+    global idle_timeout, auto_idle, max_linear_velocity, max_angular_velocity, linear_velocity_slew_rate, angular_velocity_slew_rate
 
     idle_timeout            = config['idle_timeout']
     auto_idle               = config['auto_idle']
     max_linear_velocity     = config['max_linear_velocity']
     max_angular_velocity    = config['max_angular_velocity']
+
+    linear_velocity_slew_rate      = config['linear_velocity_slew_rate']
+    angular_velocity_slew_rate     = config['angular_velocity_slew_rate']
     
     return config # not sure why this is done - that's what the example did.....
 
