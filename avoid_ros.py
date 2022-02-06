@@ -24,9 +24,22 @@ import avoid
 
 #############################################  Parameter stuff....  #####################################################
 
-import reconfiguration as r
+import reconfiguration as config
+
+avoid.turn_speed = 1.5
+config.params.add("turn_speed", config.double_t, 0, "mturn_speed",    1.5, 0.0,   10.0)
+
+def config_callback(config, level):
+
+    avoid.turn_speed            = config['turn_speed']
+    
+    return config # not sure why this is done - that's what the example did.....
 
 #############################################  Parameter stuff....  #####################################################
+
+#for automatic restart if script changes
+from os.path import getmtime
+file_time = getmtime(__file__)
 
 
 
@@ -99,6 +112,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 rospy.init_node('avoid')
 
+config.start(config_callback)
 
 cmd_vel_pub =  rospy.Publisher("cmd_vel",       Twist,        queue_size=5,     tcp_nodelay=True)
 
@@ -107,14 +121,14 @@ imu_sub =     rospy.Subscriber("laser_array",     Float32MultiArray, laser_callb
 current_time = rospy.Time.now()
 last_time = rospy.Time.now()
 
-rate = rospy.Rate(10)
-
-avoid.th = 0.3
+rate = rospy.Rate(20)
 
 while not rospy.is_shutdown():
 
 
-    #if front < th:
+    if getmtime(__file__) != file_time:
+        print("restarting....");    
+        rospy.signal_shutdown('restarting');    rospy.sleep(0.5);       os.execv(__file__, sys.argv)
     
     rate.sleep()
 

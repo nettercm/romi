@@ -25,6 +25,11 @@ import reconfiguration as r
 
 from utilities import *
 
+#for automatic restart if script changes
+from os.path import getmtime
+file_time = getmtime(__file__)
+
+
 done = False
 joystick_is_idle = False
 t_idle = 0.0
@@ -39,11 +44,11 @@ r.params.add("max_linear_velocity", r.double_t, 0, "maximum linear velocity that
 max_angular_velocity = 6.28
 r.params.add("max_angular_velocity", r.double_t, 0, "maximum angular velocity that will be published",    6.28, 0.0,   12.58)
 
-linear_velocity_slew_rate = 0.5
-r.params.add("linear_velocity_slew_rate", r.double_t, 0, "linear_velocity_slew_rate",    0.5, 0.0,   1.0)
+linear_velocity_slew_rate = 0.22
+r.params.add("linear_velocity_slew_rate", r.double_t, 0, "linear_velocity_slew_rate",    0.22, 0.0,   1.0)
 
-angular_velocity_slew_rate = 12.0
-r.params.add("angular_velocity_slew_rate", r.double_t, 0, "angular_velocity_slew_rate",    12.0, 0.0,   20.0)
+angular_velocity_slew_rate = 5.6
+r.params.add("angular_velocity_slew_rate", r.double_t, 0, "angular_velocity_slew_rate",    5.6, 0.0,   20.0)
 
 auto_idle = True
 r.params.add("auto_idle", r.bool_t, 0, "joystick automatically goes idel after some time if this is True",   True)
@@ -132,10 +137,10 @@ while (not done) and (not rospy.is_shutdown()):
     # instead of having a separate paramter to govern stopping,
     # just increase the slow-rate by a fixed factor
     if abs(js_angular_velocity) < 0.05 or js.button_states['a']==1:      
-        angular_stopping_multiplier= 2.5          
+        angular_stopping_multiplier= 1.8         
 
     if abs(js_linear_velocity) < 0.05 or js.button_states['a']==1:
-        linear_stopping_multiplier = 2.0
+        linear_stopping_multiplier = 1.4
 
     cmd_vel_data = Twist()
     cmd_vel_data.angular.x = 0.0
@@ -149,9 +154,11 @@ while (not done) and (not rospy.is_shutdown()):
     if joystick_is_idle == False:
         joy_pub.publish(cmd_vel_data)   # only publish if joystick is not idle
         
-        
+
+    if getmtime(__file__) != file_time:
+        print("restarting....");    
+        js.js_deinit();     rospy.signal_shutdown('restarting');    rospy.sleep(0.5);       os.execv(__file__, sys.argv)
+
     rate.sleep()
-
-
 
 js.js_deinit()

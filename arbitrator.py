@@ -11,6 +11,12 @@ import sys
 import signal
 import time
 
+
+#for automatic restart if script changes
+from os.path import getmtime
+file_time = getmtime(__file__)
+
+
 priority = dict()
 commands = dict()
 
@@ -58,8 +64,15 @@ cmd_vel_sub =      rospy.Subscriber("cmd_vel",          Twist,        cmd_vel_ca
 # our output
 cmd_vel_arb_pub =  rospy.Publisher("cmd_vel_arb",       Twist,        queue_size=5,     tcp_nodelay=True)
 
+cmd_vel_data = Twist()
+cmd_vel_data.angular.x = 0.0
+cmd_vel_data.angular.y = 0.0
+cmd_vel_data.linear.y =  0.0
+cmd_vel_data.linear.z =  0.0
 
-rate = rospy.Rate(10)
+rate = rospy.Rate(20)
+
+counter = 0
 
 while not rospy.is_shutdown():
 
@@ -73,19 +86,28 @@ while not rospy.is_shutdown():
         commands[c] = None  # clear the slot....don't latch the command indefinitely
 
 
-    if True: #current_priority < 99:
+    if current_priority < 99:
         print(current_priority)
-        cmd_vel_data = Twist()
-
-        cmd_vel_data.angular.x = 0.0
-        cmd_vel_data.angular.y = 0.0
         cmd_vel_data.angular.z = current_command[1] 
-
         cmd_vel_data.linear.x =  current_command[0]
-        cmd_vel_data.linear.y =  0.0
-        cmd_vel_data.linear.z =  0.0
-
         cmd_vel_arb_pub.publish(cmd_vel_data)   
+        counter = 0
+    else:
+        if counter < 4:
+            cmd_vel_arb_pub.publish(cmd_vel_data)
+            counter  = counter + 1
+        else:
+            cmd_vel_data.angular.z = 0
+            cmd_vel_data.linear.x =  0
+            cmd_vel_arb_pub.publish(cmd_vel_data)   
+
+
+    if getmtime(__file__) != file_time:
+        print("restarting....");    
+        cmd_vel_data.angular.x = 0.0;   cmd_vel_data.angular.y = 0.0;   cmd_vel_data.angular.z = 0.0
+        cmd_vel_data.linear.x =  0.0;   cmd_vel_data.linear.y =  0.0;   cmd_vel_data.linear.z =  0.0
+        cmd_vel_arb_pub.publish(cmd_vel_data);  rospy.sleep(0.5)
+        rospy.signal_shutdown('restarting');    rospy.sleep(0.5);       os.execv(__file__, sys.argv)
 
     rate.sleep()
 

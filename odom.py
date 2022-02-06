@@ -26,18 +26,19 @@ from utilities import *
 
 print("doing imports...this could take a few seconds!")
 
-#from odometry import odometry_update_v2
-
+#for automatic restart if script changes
+from os.path import getmtime
+file_time = getmtime(__file__)
 
 #################################################################################################################################
 
 import reconfiguration as r
 
-decelleration_factor = 0.25
-r.params.add("decelleration_factor", r.double_t, 0, "decelleration factor used specifically when stopping, i.e. target speed = 0",    0.25, 0,   1.0)
+decelleration_factor = 0.5
+r.params.add("decelleration_factor", r.double_t, 0, "decelleration factor used specifically when stopping, i.e. target speed = 0",    0.5, 0,   1.0)
 
-accellertion_factor = 0.15
-r.params.add("accellertion_factor", r.double_t, 0, "accellertion factor",    0.15, 0,   1.0)
+accellertion_factor = 0.5
+r.params.add("accellertion_factor", r.double_t, 0, "accellertion factor",    0.5, 0,   1.0)
 
 def config_callback(config, level):
     global decelleration_factor, accellertion_factor
@@ -469,6 +470,12 @@ while not rospy.is_shutdown():
 
     counter = counter+1
     if counter > 9:
+        # there are certain things which we want to do at 1/10th the rate....
+
+        if getmtime(__file__) != file_time:
+            print("restarting....");    
+            rospy.signal_shutdown('restarting');    rospy.sleep(0.5);       os.execv(__file__, sys.argv)
+
         counter = 0
         time.sleep(0.0005)
         b = romi_control_board.read_battery_millivolts()
