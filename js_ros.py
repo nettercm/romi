@@ -39,11 +39,11 @@ r.params.add("max_linear_velocity", r.double_t, 0, "maximum linear velocity that
 max_angular_velocity = 6.28
 r.params.add("max_angular_velocity", r.double_t, 0, "maximum angular velocity that will be published",    6.28, 0.0,   12.58)
 
-linear_velocity_slew_rate = 1.0
-r.params.add("linear_velocity_slew_rate", r.double_t, 0, "linear_velocity_slew_rate",    1.0, 0.0,   1.0)
+linear_velocity_slew_rate = 0.5
+r.params.add("linear_velocity_slew_rate", r.double_t, 0, "linear_velocity_slew_rate",    0.5, 0.0,   1.0)
 
-angular_velocity_slew_rate = 6.28
-r.params.add("angular_velocity_slew_rate", r.double_t, 0, "angular_velocity_slew_rate",    6.28, 0.0,   12.58)
+angular_velocity_slew_rate = 12.0
+r.params.add("angular_velocity_slew_rate", r.double_t, 0, "angular_velocity_slew_rate",    12.0, 0.0,   20.0)
 
 auto_idle = True
 r.params.add("auto_idle", r.bool_t, 0, "joystick automatically goes idel after some time if this is True",   True)
@@ -107,19 +107,6 @@ while (not done) and (not rospy.is_shutdown()):
     js_linear_velocity = y    * max_linear_velocity    # set max linear velocity to 0.7 meters per second
     js_angular_velocity = rx  * max_angular_velocity   # set max angular velocity to 360 degrees per second
 
-    cmd_vel_data = Twist()
-
-    cmd_vel_data.angular.x = 0.0
-    cmd_vel_data.angular.y = 0.0
-    cmd_vel_data.angular.z = slew(current_vth, js_angular_velocity, angular_velocity_slew_rate) 
- 
-    cmd_vel_data.linear.x =  slew(current_vx , js_linear_velocity, linear_velocity_slew_rate)
-    cmd_vel_data.linear.y =  0.0
-    cmd_vel_data.linear.z =  0.0
-
-
-    if joystick_is_idle == False:
-        joy_pub.publish(cmd_vel_data)   # only publish if joystick is not idle
 
     if ( abs(js_angular_velocity) < 0.01 ) and ( abs(js_linear_velocity) < 0.01 ) and js.button_states['a']==0:
         t_idle = t_idle + 0.05
@@ -140,6 +127,29 @@ while (not done) and (not rospy.is_shutdown()):
         joystick_is_idle = True
         
 
+    linear_stopping_multiplier = 1.0
+    angular_stopping_multiplier= 1.0          
+    # instead of having a separate paramter to govern stopping,
+    # just increase the slow-rate by a fixed factor
+    if abs(js_angular_velocity) < 0.05 or js.button_states['a']==1:      
+        angular_stopping_multiplier= 2.5          
+
+    if abs(js_linear_velocity) < 0.05 or js.button_states['a']==1:
+        linear_stopping_multiplier = 2.0
+
+    cmd_vel_data = Twist()
+    cmd_vel_data.angular.x = 0.0
+    cmd_vel_data.angular.y = 0.0
+    cmd_vel_data.angular.z = slew(current_vth, js_angular_velocity, angular_velocity_slew_rate*angular_stopping_multiplier) 
+    cmd_vel_data.linear.x =  slew(current_vx , js_linear_velocity, linear_velocity_slew_rate*linear_stopping_multiplier)
+    cmd_vel_data.linear.y =  0.0
+    cmd_vel_data.linear.z =  0.0
+
+
+    if joystick_is_idle == False:
+        joy_pub.publish(cmd_vel_data)   # only publish if joystick is not idle
+        
+        
     rate.sleep()
 
 
