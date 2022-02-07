@@ -91,6 +91,9 @@ def scan_callback(scan_msg : LaserScan):
                     minimums[i] = v
                 #use the average reading as the final value 
                 averages[i] = sum / count
+        if count == 0: # if we didn't receive any valid readings in this cone, assume that we are too close
+            averages[i] = 0.1
+            minimums[i] = 0.1
 
     #print("%5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f " % (ranges[0],ranges[1],ranges[2],ranges[3],ranges[4],ranges[5],ranges[6],ranges[7],ranges[8],ranges[9],ranges[10],ranges[11]))
     print("%3.1fHz  len=%3d  valid=%3d   %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f      %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f  " % 
@@ -114,7 +117,7 @@ def scan_callback(scan_msg : LaserScan):
         laser_msg.radiation_type = Range.INFRARED
         laser_msg.field_of_view = 0.523599  # 30 degrees
         laser_msg.max_range = 9.0
-        laser_msg.min_range = 0.14
+        laser_msg.min_range = 0.1
         laser_msg.range = values[12-i]
         laser_msg.header.frame_id = frame_id[i]
         laser_msg.header.stamp = scan_msg.header.stamp
