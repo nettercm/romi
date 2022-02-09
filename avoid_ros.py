@@ -9,7 +9,7 @@ import termios
 import fcntl
 import os
 import numpy as np
-import statistics 
+import statistics
 
 import rospy
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
@@ -22,6 +22,8 @@ from utilities import *
 
 import avoid
 
+
+
 #############################################  Parameter stuff....  #####################################################
 
 import reconfiguration as config
@@ -30,18 +32,20 @@ avoid.turn_speed = 1.5
 config.params.add("turn_speed", config.double_t, 0, "mturn_speed",    1.5, 0.0,   10.0)
 
 def config_callback(config, level):
-
     avoid.turn_speed            = config['turn_speed']
-    
     return config # not sure why this is done - that's what the example did.....
 
 #############################################  Parameter stuff....  #####################################################
 
+
+
 #for automatic restart if script changes
 from os.path import getmtime
-file_time = getmtime(__file__)
+WATCHED_FILES = [__file__,'avoid.py']
+WATCHED_FILES_MTIMES = [(f, getmtime(f)) for f in WATCHED_FILES]
 
-
+current_vth = 0.0
+current_vx  = 0.0
 
 done = 0
 
@@ -76,7 +80,8 @@ def signal_handler(sig, frame):
 
 
 def do_avoid(r):
-
+    global current_vx, current_vth
+    
     cmd_vel_data = Twist()
 
     cmd_vel_data.angular.x = 0.0
@@ -86,7 +91,7 @@ def do_avoid(r):
     cmd_vel_data.linear.y =  0.0
     cmd_vel_data.linear.z =  0.0
 
-    result =  avoid.avoid_behavior(r)
+    result =  avoid.avoid_behavior(r, current_vx,  current_vth)
     if result != None:
         cmd_vel_data.angular.z = result[1]
         cmd_vel_data.linear.x = result[0]
@@ -98,10 +103,19 @@ def do_avoid(r):
 
 def laser_callback(msg : Float32MultiArray):
     global r
-
     r = msg.data
     do_avoid(r)
+    return
 
+
+
+def odom_callback(msg : Odometry):
+    """
+    grab current velocities, so avoid logic can use it
+    """
+    global current_vx, current_vth
+    current_vx = msg.twist.twist.linear.x
+    current_vth= msg.twist.twist.angular.z
     return
 
 
@@ -114,21 +128,26 @@ rospy.init_node('avoid')
 
 config.start(config_callback)
 
-cmd_vel_pub =  rospy.Publisher("cmd_vel",       Twist,        queue_size=5,     tcp_nodelay=True)
+cmd_vel_pub =  rospy.Publisher("cmd_vel",       Twist,        queue_size=2,     tcp_nodelay=True,    latch=False)
 
-imu_sub =     rospy.Subscriber("laser_array",     Float32MultiArray, laser_callback,     tcp_nodelay=True)
+odom_slow_sub= rospy.Subscriber("odom_slow", Odometry,  odom_callback,     tcp_nodelay=True)
+
+laser_sub =      rospy.Subscriber("laser_array",     Float32MultiArray, laser_callback,     tcp_nodelay=True)
+
 
 current_time = rospy.Time.now()
 last_time = rospy.Time.now()
 
-rate = rospy.Rate(20)
+rate = rospy.Rate(10)  # the loop is not doing anythin.....
 
 while not rospy.is_shutdown():
 
+    # nothing to do in the main loop - logic is triggered from the laser callback
 
-    if getmtime(__file__) != file_time:
-        print("restarting....");    
-        rospy.signal_shutdown('restarting');    rospy.sleep(0.5);       os.execv(__file__, sys.argv)
+    for f, mtime in WATCHED_FILES_MTIMES:
+        if getmtime(f) != mtime:
+            print("restarting....");    
+            rospy.signal_shutdown('restarting');    rospy.sleep(0.5);       os.execv(__file__, sys.argv)
     
     rate.sleep()
 
