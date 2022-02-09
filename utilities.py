@@ -71,6 +71,7 @@ def norm(theta):
 def slew( f:float, t:float, r:float ):  # from, to, rate
     """
     ramp a value (e.g. speed) up or down at a specific rate
+    inputs: from,  to,  slew-rate
     """
     difference = t - f
     if difference > r:
