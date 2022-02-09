@@ -70,7 +70,7 @@ cmd_vel_data.angular.y = 0.0
 cmd_vel_data.linear.y =  0.0
 cmd_vel_data.linear.z =  0.0
 
-rate = rospy.Rate(20)
+rate = rospy.Rate(10)  # needs to be slower than the slowest publisher of /cmd_vel
 
 counter = 0
 
