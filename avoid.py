@@ -10,6 +10,22 @@ side_speed  = 0.3   # go this slow if there some something on the side (but noth
 
 turn_speed  = 6.0
 
+'''
+
+09  10  11  12  01  02  03
+        0   0   0               No obstacle
+        0   0   1               right only.     keep vx.  turn left.
+        0   1   0               front.          reduce vx.  if turning, keep turning (but turn faster). if not turning, start turning
+        0   1   1               front.          reduce vx.  turn left.
+        1   0   0               left.           keep vx.   turn right.
+        1   0   1               front.          reduce vx.  if turning, keep turning (but turn faster). if not turning, start turning
+        1   1   0               front.          reduce vx.  turn right.
+        1   1   1               front.          reduce vx.   keep turning.
+
+'''
+
+
+
 def avoid_behavior(r, current_vx, current_vth):
     """
     avoid obstacles
@@ -30,42 +46,51 @@ def avoid_behavior(r, current_vx, current_vth):
 
         # all 3 front-facing sensors < min ?
         if (left < side_min) and (right < side_min):
-            print("A   %4.2f,%4.2f,%4.2f   obstacle in front!" % (left,front,right))
-            angular = slew(current_vth, sign(current_vth)*turn_speed*2.2, 7.0)  # keep turning in the same direction
+            if abs(current_vth) > 0.5:  # are we already turning? then keep turning in the same direction
+                print("A   %4.2f,%4.2f,%4.2f obstacle in front!  keep turning"  % (left,front,right))
+                angular = slew(current_vth, sign(current_vth)*turn_speed*2.2, 7.0)  # keep turning in the same direction
+
+            elif left <= right:
+                print("B   %4.2f,%4.2f,%4.2f obstacle in front-left!"  % (left,front,right))
+                angular = slew(current_vth, -turn_speed*2.2, 7.0)
+
+            else: #elif right < front:
+                print("C   %4.2f,%4.2f,%4.2f obstacle in front-right!"  % (left,front,right))
+                angular = slew(current_vth, turn_speed*2.2, 7.0)
 
         # front + front-left is < min
         elif (left < side_min) and (right >= side_min):
-            print("B  %4.2f,%4.2f,%4.2f obstacle in front!" % (left,front,right))
+            print("D  %4.2f,%4.2f,%4.2f obstacle in front-left!" % (left,front,right))
             angular = slew(current_vth, -turn_speed*2.2, 7.0)
 
         # front + front-rigth is < min
         elif (right < side_min) and (left >= side_min):
-            print("C   %4.2f,%4.2f,%4.2f obstacle in front!"  % (left,front,right))
+            print("E   %4.2f,%4.2f,%4.2f obstacle in front-right!"  % (left,front,right))
             angular = slew(current_vth, turn_speed*2.2, 7.0)
 
         else: # OK so only the front is < min, and none of the sides are < min
 
             if abs(current_vth) > 0.5:  # are we already turning? then keep turning in the same direction
-                print("D   %4.2f,%4.2f,%4.2f keep turning"  % (left,front,right))
+                print("F   %4.2f,%4.2f,%4.2f keep turning"  % (left,front,right))
                 angular = slew(current_vth, sign(current_vth)*turn_speed*1.2, 7.0)  # keep turning in the same direction
 
             elif left <= right:
-                print("E   %4.2f,%4.2f,%4.2f obstacle in front!"  % (left,front,right))
+                print("G   %4.2f,%4.2f,%4.2f obstacle in front!"  % (left,front,right))
                 angular = slew(current_vth, -turn_speed*2.2, 7.0)
 
             else: #elif right < front:
-                print("F   %4.2f,%4.2f,%4.2f obstacle in front!"  % (left,front,right))
+                print("H   %4.2f,%4.2f,%4.2f obstacle in front!"  % (left,front,right))
                 angular = slew(current_vth, turn_speed*2.2, 7.0)
 
         return ( linear , angular )
 
     elif (left < side_min):
-        print("G  %4.2f,%4.2f,%4.2f obstacle on the left!"  % (left,front,right))
+        print("I  %4.2f,%4.2f,%4.2f obstacle on the left!"  % (left,front,right))
         #return ( slew(current_vx, side_speed, 0.15), slew(current_vth, -turn_speed, 7.0) )
         return ( current_vx, slew(current_vth, -turn_speed, 7.0) )
     
     elif (right < side_min):
-        print("H  %4.2f,%4.2f,%4.2f obstacle on the right!"  % (left,front,right))
+        print("J  %4.2f,%4.2f,%4.2f obstacle on the right!"  % (left,front,right))
         #return ( slew(current_vx, side_speed, 0.15), slew(current_vth, turn_speed, 7.0) )
         return ( current_vx, slew(current_vth, turn_speed, 7.0) )
 
