@@ -15,7 +15,7 @@ import time
 #for automatic restart if script changes
 from os.path import getmtime
 file_time = getmtime(__file__)
-
+print("%s: last modified: %s" % (__file__, time.ctime(file_time)))
 
 priority = dict()
 commands = dict()
