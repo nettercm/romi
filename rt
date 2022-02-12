@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sudo chrt -p -r 3 $PPID 
+
