@@ -49,9 +49,6 @@ current_vx  = 0.0
 
 done = 0
 
-
-t_last_print = time.monotonic()
-
 commanded_linear_velocity = 0.0
 commanded_angular_velocity = 0.0
 

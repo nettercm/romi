@@ -2,9 +2,6 @@
 
 import time
 
-from jinja2 import TemplateRuntimeError
-print("%11.3f" % (time.monotonic()))  # print some time stamps for profiling purposes
-
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from math import cos, sin, pi, atan2
 from std_msgs.msg import Int16, Int32, Float32MultiArray
@@ -63,8 +60,6 @@ def config_callback(config, level):
     return config # not sure why this is done - that's what the example did.....
 
 
-
-print("%11.3f" % (time.monotonic()))  # print some time stamps for profiling purposes
 
 '''
 ros:  
@@ -165,7 +160,7 @@ r.start(config_callback)
 while (not rospy.is_shutdown()) and (not done):
 
     current_time = rospy.Time.now() # ROS time...
-    t = time.monotonic()            # wall clock time.... 
+    t = current_time.to_sec()         
 
     # produce the navigation command and determine if we already reached the target
     #
