@@ -96,7 +96,7 @@ def scan_callback(scan_msg : LaserScan):
             minimums[i] = 0.1
 
     #print("%5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f " % (ranges[0],ranges[1],ranges[2],ranges[3],ranges[4],ranges[5],ranges[6],ranges[7],ranges[8],ranges[9],ranges[10],ranges[11]))
-    print("%3.1fHz  len=%3d  valid=%3d   %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f      %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f  " % 
+    print("%3.1fHz  len=%3d  valid=%3d   min = %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f      avg = %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f  " % 
         (
             hz, l , valid, 
             minimums[3],minimums[2],minimums[1],minimums[0],minimums[11],minimums[10],minimums[9],
@@ -151,7 +151,7 @@ laser_pub[9]  =rospy.Publisher("laser9",  Range,        queue_size=5, tcp_nodela
 laser_pub[10] =rospy.Publisher("laser10", Range,        queue_size=5, tcp_nodelay=True)
 laser_pub[11] =rospy.Publisher("laser11", Range,        queue_size=5, tcp_nodelay=True)
 
-array_pub     =rospy.Publisher("laser_array", Float32MultiArray, queue_size=5, tcp_nodelay=True)
+array_pub     =rospy.Publisher("laser_array", Float32MultiArray, queue_size=2, tcp_nodelay=True)
 
 TWO_PI = 2.0 * pi
 
