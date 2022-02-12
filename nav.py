@@ -12,6 +12,8 @@ linear_speed       = 0.3
 bearing_threashold = 80.0       # if bearing is off by more than that, we steer hard and slow way way down
 slow_down_factor   = 0.1
 
+obstacle_left       = False
+obstacle_right      = False
 
 last_distance = 0.0
 debug = True
@@ -54,13 +56,17 @@ def target_vector(X_position, Y_position, Theta,   X_target, Y_target):
 
 
 
-def navigate_target(X_position, Y_position, Theta, X_target,Y_target):
+def navigate_target(X_position, Y_position, Theta, X_target,Y_target, ranges):
     """
     This is the primary function provided by this module
     produce a navigation command (desired linear + angular velocity) that will take us closer to the target
     also indicate if we reached the target
     """
-    global last_distance
+    global last_distance, obstacle_right, obstacle_left
+
+    obstacle_left = False;  obstacle_right = False
+    if (ranges[1]  < 0.20) or (ranges[2]  < 0.18) or (ranges[3] < 0.16):  obstacle_left  = True
+    if (ranges[11] < 0.20) or (ranges[10] < 0.18) or (ranges[9] < 0.16):  obstacle_right = True
 
     (distance,bearing) = target_vector(X_position, Y_position, Theta, X_target,Y_target)
     acquired = target_acquired(distance, last_distance)
@@ -85,6 +91,16 @@ def navigate_target(X_position, Y_position, Theta, X_target,Y_target):
         commanded_angular_speed = (bearing / rads(bearing_threashold)) * angular_speed
         linear_speed_factor = 1.0
 
+    if obstacle_right and commanded_angular_speed < 0:
+        # don't turn right if there is something on the right
+        commanded_angular_speed = 0
+        linear_speed_factor = 1.0
+
+    if obstacle_left and commanded_angular_speed > 0:
+        # don't turn left if there is something on the left
+        commanded_angular_speed = 0
+        linear_speed_factor = 1.0
+
     # as we get closer to the target, slow down more and more
     # example: half way between DOWNRAMP and actual target, commanded linear speed will be only 50% of full speed  ( e.g. 0.1 / 0.2 = 0.5 )
     if distance < downramp:
@@ -104,18 +120,19 @@ def navigate_target(X_position, Y_position, Theta, X_target,Y_target):
 if __name__ == '__main__':
 
     # test cases
+    ranges = [9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0]
 
     print( target_vector(0,0,0, 0,0))
     print( target_vector(0,0,0, 1,0))
     print( target_vector(0,0,0, 0,1))
     print( target_vector(0,0,0, 0,-1))
 
-    print( navigate_target(0,0,0, 1,0)  )
+    print( navigate_target(0,0,0, 1,0, ranges)  )
  
-    print( navigate_target(0,0,0, -1,0)  )
-    print( navigate_target(0,0,0, -1,0.1)  )
-    print( navigate_target(0,0,0, -1,-0.1)  )
+    print( navigate_target(0,0,0, -1,0, ranges)  )
+    print( navigate_target(0,0,0, -1,0.1, ranges)  )
+    print( navigate_target(0,0,0, -1,-0.1, ranges)  )
 
-    print( navigate_target(0,0,0, 0,1)  )
-    print( navigate_target(0,0,0, 1,1)  )
-    print( navigate_target(0,0,0, 1,-1)  )
+    print( navigate_target(0,0,0, 0,1, ranges)  )
+    print( navigate_target(0,0,0, 1,1, ranges)  )
+    print( navigate_target(0,0,0, 1,-1, ranges)  )

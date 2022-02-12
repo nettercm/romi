@@ -7,7 +7,7 @@ print("%11.3f" % (time.monotonic()))  # print some time stamps for profiling pur
 
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 from math import cos, sin, pi, atan2
-from std_msgs.msg import Int16, Int32
+from std_msgs.msg import Int16, Int32, Float32MultiArray
 from geometry_msgs.msg import PointStamped
 from nav_msgs.msg import Odometry
 import tf
@@ -78,6 +78,7 @@ X_position = 0.0
 Y_position = 0.0
 Theta = 0.0
 odometry_ready = False
+ranges = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
 
 done = False
 
@@ -113,6 +114,16 @@ def odom_callback(msg: Odometry):
     return
 
 
+
+
+def laser_callback(msg : Float32MultiArray):
+    global ranges
+    ranges = msg.data
+    return
+
+
+
+
 myargv = rospy.myargv(argv=sys.argv)
 print(sys.argv)
 print(myargv)
@@ -134,6 +145,7 @@ Y_target = scanf_result[1]
 #
 rospy.init_node('navigate',disable_signals=True)
 odom_sub = rospy.Subscriber("odom", Odometry,        odom_callback, tcp_nodelay=True)
+laser_sub =      rospy.Subscriber("laser_array",     Float32MultiArray, laser_callback,     tcp_nodelay=True)
 cmd_vel_pub = rospy.Publisher("cmd_vel", Twist, queue_size=5, tcp_nodelay=True)
 cmd_vel_data = Twist()
 rate = rospy.Rate(20)  # loop rate of 20Hz seems sufficient
@@ -157,7 +169,7 @@ while (not rospy.is_shutdown()) and (not done):
 
     # produce the navigation command and determine if we already reached the target
     #
-    (acquired, commanded_linear_speed, commanded_angular_speed, distance, bearing) = nav.navigate_target(  X_position, Y_position, Theta,     X_target, Y_target  )
+    (acquired, commanded_linear_speed, commanded_angular_speed, distance, bearing) = nav.navigate_target(  X_position, Y_position, Theta,     X_target, Y_target,   ranges  )
 
     # publish the commanded speed via a standard ROS /cmd_vel mesage of type Twist
     #
