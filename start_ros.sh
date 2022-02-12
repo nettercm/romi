@@ -12,7 +12,8 @@ sleep 2
 killall roscore &>/dev/null
 lidar_off
 
-sudo chrt -p -f 3 $$
+sudo chrt -p -r 3 $$
+sudo sysctl kernel.sched_rr_timeslice_ms=5
 
 sleep 2 
 

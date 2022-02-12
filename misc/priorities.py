@@ -40,7 +40,7 @@ while True:
                 if sched == 0:
                     print("time=%11.1f  name=%40s  pid=%6d  sched=%d  prio=%3d  ppid=%6d" % (time.monotonic(),name,pid,sched,prio,ppid))
                     param = os.sched_param(1)
-                    os.sched_setscheduler(pid, os.SCHED_FIFO, param)
+                    os.sched_setscheduler(pid, os.SCHED_RR, param)
 
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
