@@ -29,10 +29,34 @@ import avoid
 import reconfiguration as config
 
 avoid.turn_speed = 1.5
-config.params.add("turn_speed", config.double_t, 0, "mturn_speed",    1.5, 0.0,   10.0)
+config.params.add("turn_speed", config.double_t, 0, "turn_speed",    1.5, 0.0,   10.0)
+
+avoid.front_min = 0.3
+config.params.add("front_min", config.double_t, 0, "front_min",    0.3, 0.1,   1.0)
+
+avoid.side_min = 0.3
+config.params.add("side_min", config.double_t, 0, "side_min",    0.3, 0.1,   1.0)
+
+avoid.front_speed = 0.1
+config.params.add("front_speed", config.double_t, 0, "front_speed",    0.1, -0.2,   0.5)
+
+avoid.side_speed = 0.3
+config.params.add("side_speed", config.double_t, 0, "side_speed",    0.3,  0.1,   0.5)
+
+avoid.vx_slew_rate = 0.35
+config.params.add("vx_slew_rate", config.double_t, 0, "vx_slew_rate",    0.35,  0.1,   0.7)
+
+avoid.vth_slew_rate = 7.0
+config.params.add("vth_slew_rate", config.double_t, 0, "vth_slew_rate",    7.0, 1.0,   10.0)
 
 def config_callback(config, level):
     avoid.turn_speed            = config['turn_speed']
+    avoid.front_min             = config['front_min']
+    avoid.side_min              = config['side_min']
+    avoid.front_speed           = config['front_speed']
+    avoid.side_speed            = config['side_speed']
+    avoid.vx_slew_rate          = config['vx_slew_rate']
+    avoid.vth_slew_rate         = config['vth_slew_rate']
     return config # not sure why this is done - that's what the example did.....
 
 #############################################  Parameter stuff....  #####################################################
