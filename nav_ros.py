@@ -73,7 +73,7 @@ X_position = 0.0
 Y_position = 0.0
 Theta = 0.0
 odometry_ready = False
-ranges = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+ranges = [9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0,9.0]
 
 done = False
 
