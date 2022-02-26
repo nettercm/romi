@@ -24,9 +24,14 @@ use_minimums = True
 r.params.add("use_minimums", r.bool_t, 0, "If true, use the minimum reading as the final value. If false, use the average",   True)
 
 
+fov = 15
+r.params.add("fov", r.int_t, 0, "FOV for each range sensor",  default=15, min=5, max=30)
+
+
 def config_callback(config, level):
-    global use_minimums
+    global use_minimums, fov
     use_minimums            = config['use_minimums']
+    fov                     = config['fov']
     return config # not sure why this is done - that's what the example did.....
 
 
@@ -57,8 +62,13 @@ def ms(time):
 last_publish = rospy.Time(0)
 last_hz = 0
 
+last_minimums = [99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0,99.0]
+last_averages = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+invalid       = [0,0,0,0,0,0,0,0,0,0,0,0,0]
+
 def scan_callback(scan_msg : LaserScan):
     global skip_scan, dps, last_publish, last_hz, frame_id, laser_pub
+    global invalid, last_minimums, last_averages
 
     t = rospy.Time.now()
 
@@ -71,16 +81,22 @@ def scan_callback(scan_msg : LaserScan):
     hz = (3.0*last_hz + (1.0 / scan_msg.scan_time)) / 4.0
     last_hz = hz
     
-    for i in range(0,12):
-        s = (i * 60) - 30
+    num_samples = 720
+    num_ranges = 12
+    samples_per_range = int(720/num_ranges)
+    samples_per_fov   = int( samples_per_range / ( (360/12)/fov ) )
+
+    for i in range(0,num_ranges):  # we are producing 12 ranges;  there are 720 samples in each scan => 60 samples per range
+        # s is the starting point for this range
+        s = int( (i * samples_per_range) - (samples_per_fov/2) )
         if s < 0:
-            s = s + 720
+            s = s + num_samples
         sum = 0.0
         count = 0
-        for j in range(0,60):
+        for j in range(0,samples_per_fov):
             v = scan_msg.ranges[s]
             s = s + 1
-            if s > 719:
+            if s > (num_samples-1):
                 s = 0
             if v != float("inf"):
                 valid = valid + 1
@@ -91,9 +107,15 @@ def scan_callback(scan_msg : LaserScan):
                     minimums[i] = v
                 #use the average reading as the final value 
                 averages[i] = sum / count
-        if count == 0: # if we didn't receive any valid readings in this cone, assume that we are too close
-            averages[i] = 0.1
-            minimums[i] = 0.1
+                invalid[i] = 0
+        if count == 0: # if we didn't receive any valid readings a couple of times in a row, assume that we are too close
+            if invalid[i] > 2:
+                averages[i] = 0.1
+                minimums[i] = 0.1
+            else:
+                invalid[i] = invalid[i] + 1
+                averages[i] = last_averages[i]
+                minimums[i] = last_minimums[i]
 
     #print("%5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f %5.3f " % (ranges[0],ranges[1],ranges[2],ranges[3],ranges[4],ranges[5],ranges[6],ranges[7],ranges[8],ranges[9],ranges[10],ranges[11]))
     print("%3.1fHz  len=%3d  valid=%3d   min = %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f      avg = %5.3f %5.3f %5.3f   %5.3f   %5.3f %5.3f %5.3f  " % 
@@ -107,18 +129,21 @@ def scan_callback(scan_msg : LaserScan):
     averages[12] = averages[0]
     minimums[12] = minimums[0]
 
+    last_minimums = minimums
+    last_averages = averages
+
     if use_minimums:
         values = minimums
     else:
         values = averages
         
     laser_msg = Range()
-    for i in range(0,12):
+    for i in range(0,num_ranges):
         laser_msg.radiation_type = Range.INFRARED
-        laser_msg.field_of_view = 0.523599  # 30 degrees
+        laser_msg.field_of_view = rads(fov)  #0.523599  # 30 degrees
         laser_msg.max_range = 9.0
         laser_msg.min_range = 0.1
-        laser_msg.range = values[12-i]
+        laser_msg.range = values[num_ranges-i]
         laser_msg.header.frame_id = frame_id[i]
         laser_msg.header.stamp = scan_msg.header.stamp
         laser_pub[i].publish(laser_msg)
