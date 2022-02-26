@@ -58,8 +58,13 @@ def cmd_vel_callback(msg : Twist):
 
 rospy.init_node('arbitrator')
 
-# our intput
+# the individual behaviors call all publish to /cmd_vel
 cmd_vel_sub =      rospy.Subscriber("cmd_vel",          Twist,        cmd_vel_callback, tcp_nodelay=True)
+
+# also allow the individual behaviors to publish on unique topics
+cmd_vel_joy_sub =  rospy.Subscriber("cmd_vel_joy",      Twist,        cmd_vel_callback, tcp_nodelay=True)
+cmd_vel_nav_sub =  rospy.Subscriber("cmd_vel_nav",      Twist,        cmd_vel_callback, tcp_nodelay=True)
+cmd_vel_avoid_sub= rospy.Subscriber("cmd_vel_avoid",    Twist,        cmd_vel_callback, tcp_nodelay=True)
 
 # our output
 cmd_vel_arb_pub =  rospy.Publisher("cmd_vel_arb",       Twist,        queue_size=5,     tcp_nodelay=True)
@@ -74,6 +79,8 @@ rate = rospy.Rate(10)  # needs to be slower than the slowest publisher of /cmd_v
 
 counter = 0
 
+latch_duration = 1
+
 while not rospy.is_shutdown():
 
     current_priority = 99
@@ -87,16 +94,19 @@ while not rospy.is_shutdown():
 
 
     if current_priority < 99:
-        print(current_priority)
+        print("%8.3f: %d" % (time.monotonic(), current_priority))
         cmd_vel_data.angular.z = current_command[1] 
         cmd_vel_data.linear.x =  current_command[0]
         cmd_vel_arb_pub.publish(cmd_vel_data)   
         counter = 0
     else:
-        if counter < 4:
+        if counter < latch_duration:
+            print("%8.3f: %d  -  latched" % (time.monotonic(), current_priority))
             cmd_vel_arb_pub.publish(cmd_vel_data)
             counter  = counter + 1
         else:
+            if counter == latch_duration: print("%8.3f: %d  -  stopping" % (time.monotonic(), current_priority))
+            counter = latch_duration+1
             cmd_vel_data.angular.z = 0
             cmd_vel_data.linear.x =  0
             cmd_vel_arb_pub.publish(cmd_vel_data)   
