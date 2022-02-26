@@ -35,10 +35,10 @@ file_time = getmtime(__file__)
 import reconfiguration as r
 
 decelleration_factor = 0.5
-r.params.add("decelleration_factor", r.double_t, 0, "decelleration factor used specifically when stopping, i.e. target speed = 0",    0.5, 0,   1.0)
+r.params.add("decelleration_factor", r.double_t, 0, "decelleration factor used specifically when stopping, i.e. target speed = 0",    0.5, 0,   2.0)
 
 accellertion_factor = 0.5
-r.params.add("accellertion_factor", r.double_t, 0, "accellertion factor",    0.5, 0,   1.0)
+r.params.add("accellertion_factor", r.double_t, 0, "accellertion factor",    0.5, 0,   2.0)
 
 def config_callback(config, level):
     global decelleration_factor, accellertion_factor
@@ -171,7 +171,7 @@ def cmd_vel_callback(msg):
 
 
 def imu_callback(msg):
-    odometry.th = rads(msg.point.x)
+    odometry.th = norm(rads(msg.point.x))
 
 
 #######################################################################
@@ -517,7 +517,7 @@ while not rospy.is_shutdown():
             delta_R,
             l_target,
             r_target,
-            odometry.x, odometry.y, degs(norm(odometry.th)),odometry.th,
+            odometry.x, odometry.y, degs(norm(odometry.th)),norm(odometry.th),
             us_left, us_right))
 
     rate.sleep()
