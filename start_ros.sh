@@ -13,7 +13,8 @@ killall roscore &>/dev/null
 lidar_off
 
 sudo chrt -p -r 3 $$
-sudo sysctl kernel.sched_rr_timeslice_ms=5
+sudo sysctl kernel.sched_rr_timeslice_ms=1
+sudo cpufreq-set -g performance
 
 sleep 2 
 
