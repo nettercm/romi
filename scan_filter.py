@@ -92,7 +92,7 @@ def scan_callback(scan_msg : LaserScan):
         print("time went backwards....!")
         last_publish = t
 
-    if dps < 65.0:
+    if dps < 25.0:
         if dT > 0.0:
             scan_pub.publish(scan_msg)
             last_publish = t
