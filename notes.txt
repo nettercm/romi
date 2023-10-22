@@ -1,4 +1,14 @@
 
+disable tf_map_to_odom.launch
+
+gridmap has -nan as the z-value origin...issue?
+
+use_map_topic=true + map server => does not seem to work
+
+
+
+#################################################################################################################
+
 Ubuntu 64-bit:
 
 Linux pi-mate 5.4.0-1028-raspi #31-Ubuntu SMP PREEMPT Wed Jan 20 11:30:45 UTC 2021 aarch64 aarch64 aarch64 GNU/Linux
@@ -17,6 +27,8 @@ sudo chrt -f 60 python3 ./test.py
 almost no timing errors
 
 
+
+#################################################################################################################
 
 USB serial:
 115200 baud,  30 bytes round trip @ 100 Hz  (theoretical round-trip = 2.6ms)
