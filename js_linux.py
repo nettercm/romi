@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-
+# Import necessary modules for device I/O, threading, and system operations
 import os, struct, array
 from fcntl import ioctl
 import time
@@ -10,12 +10,12 @@ import sys
 import select
 
 # We'll store the states here.
-axis_states = {}
-button_states = {}
-
-done = False
+axis_states = {} # axis_states: Holds the current value of each axis (e.g., x, y, z, etc.)
+button_states = {} # button_states: Holds the current state (pressed/released) of each button
+done = False  # Flag to indicate when to stop reading joystick events
 
 # These constants were borrowed from linux/input.h
+# Mapping of axis codes to human-readable names
 axis_names = {
     0x00 : 'x',
     0x01 : 'y',
@@ -45,6 +45,7 @@ axis_names = {
     0x28 : 'misc',
 }
 
+# Mapping of button codes to human-readable names
 button_names = {
     0x120 : 'trigger',
     0x121 : 'thumb',
@@ -87,23 +88,39 @@ button_names = {
     0x2c3 : 'dpad_down',
 }
 
+# Lists to store the mapping of axes and buttons for the current joystick
 axis_map = []
 button_map = []
+# File handles for the joystick device
 jsdev = None
 jsdev_os = None
+# Thread object for reading joystick events
 thread_1=None
 
-def js_thread(q,id):
-    global jsdev, axis_map,axis_states,axis_names,button_map,button_names,button_states, done
+
+def js_thread(q, id):
+    """
+    Thread function that reads joystick events using a blocking file object.
+    
+    This function continuously reads joystick events from the jsdev file object,
+    unpacks the event data, and updates the corresponding button and axis states.
+    It runs until the 'done' flag is set to True or the 'mode' button is pressed.
+    
+    Args:
+        q: A queue object (not currently used but kept for interface consistency)
+        id: Thread identifier (not currently used but kept for interface consistency)
+    """
+    global jsdev, axis_map, axis_states, axis_names, button_map, button_names, button_states, done
     while not done:
-        evbuf = jsdev.read(8)
+        evbuf = jsdev.read(8)  # Read 8 bytes (one event)
         if evbuf:
-            t, value, type, number = struct.unpack('IhBB', evbuf)
+            t, value, type, number = struct.unpack('IhBB', evbuf)  # Unpack event structure
             #print(struct.unpack('IhBB', evbuf))
 
             #if type & 0x80:
                 #print("(initial)", end="")
 
+            # Button event
             if type & 0x01:
                 button = button_map[number]
                 if button:
@@ -113,21 +130,37 @@ def js_thread(q,id):
                     #else:
                         #print("%s released" % (button))
 
+            # Axis event
             if type & 0x02:
                 axis = axis_map[number]
                 if axis:
-                    fvalue = value / 32767.0
+                    fvalue = value / 32767.0  # Normalize axis value
                     axis_states[axis] = fvalue
                     #print("%s: %.3f" % (axis, fvalue))
 
+        # If the 'mode' button is pressed, signal to stop
         if button_states['mode'] == 1:
             done = True
 
 
-def js_thread_v2(q,id):
-    global jsdev_os, axis_map,axis_states,axis_names,button_map,button_names,button_states, done
+
+def js_thread_v2(q, id):
+    """
+    Thread function that reads joystick events using a non-blocking file descriptor.
+    
+    This function continuously checks for joystick events using select() to avoid blocking,
+    reads the events when available, unpacks the event data, and updates the corresponding 
+    button and axis states. It runs until the 'done' flag is set to True or the 'mode' 
+    button is pressed.
+    
+    Args:
+        q: A queue object (not currently used but kept for interface consistency)
+        id: Thread identifier (not currently used but kept for interface consistency)
+    """
+    global jsdev_os, axis_map, axis_states, axis_names, button_map, button_names, button_states, done
     while not done:
         evbuf=None
+        # Use select to check if data is available (non-blocking)
         s = select.select([jsdev_os],[],[],0.1)
         if len(s[0]) > 0:
             evbuf = os.read(jsdev_os,8)
@@ -139,6 +172,7 @@ def js_thread_v2(q,id):
             #if type & 0x80:
                 #print("(initial)", end="")
 
+            # Button event
             if type & 0x01:
                 button = button_map[number]
                 if button:
@@ -148,18 +182,37 @@ def js_thread_v2(q,id):
                     #else:
                         #print("%s released" % (button))
 
+            # Axis event
             if type & 0x02:
                 axis = axis_map[number]
                 if axis:
-                    fvalue = value / 32767.0
+                    fvalue = value / 32767.0  # Normalize axis value
                     axis_states[axis] = fvalue
                     #print("%s: %.3f" % (axis, fvalue))
 
+        # If the 'mode' button is pressed, signal to stop
         if button_states['mode'] == 1:
             done = True
 
 
+
 def js_init():
+    """
+    Initialize the joystick device and start the event reading thread.
+    
+    This function:
+    1. Lists available joystick devices
+    2. Opens the joystick device (defaults to /dev/input/js0)
+    3. Retrieves device information (name, number of axes and buttons)
+    4. Sets up axis and button mappings
+    5. Starts a non-blocking thread to read joystick events
+    
+    Returns:
+        None
+        
+    Raises:
+        IOError: If the joystick device cannot be opened or accessed
+    """
     global fn
     global jsdev
     global jsdev_os
@@ -171,21 +224,26 @@ def js_init():
         if fn.startswith('js'):
             print('  /dev/input/%s' % (fn))
 
-    # Open the joystick device.
+    # Open the joystick device (default to js0)
     fn = '/dev/input/js0'
 
     print('Opening %s...' % fn)
-    jsdev = open(fn, 'rb')
-    jsdev_os = os.open('/dev/input/js0',os.O_RDONLY|os.O_NONBLOCK)
+    jsdev = open(fn, 'rb')  # Open as file object (blocking)
+    jsdev_os = os.open('/dev/input/js0',os.O_RDONLY|os.O_NONBLOCK)  # Open as file descriptor (non-blocking)
 
     # Get the device name.
-    #buf = bytearray(63)
+    # The ioctl() call below uses the JSIOCGNAME(len) request code to get the joystick's name string.
+    # 0x80006a13 is the base code for JSIOCGNAME, and (0x10000 * len(buf)) encodes the buffer length.
+    # The result is stored in 'buf', which is then decoded to a UTF-8 string.
     buf = array.array('B', [0] * 64)
     ioctl(jsdev, 0x80006a13 + (0x10000 * len(buf)), buf) # JSIOCGNAME(len)
     js_name = buf.tobytes().rstrip(b'\x00').decode('utf-8')
     print('Device name: %s' % js_name)
 
     # Get number of axes and buttons.
+    # The following ioctl() calls use JSIOCGAXES and JSIOCGBUTTONS request codes to get the number of axes and buttons.
+    # 0x80016a11 (JSIOCGAXES) returns the number of axes supported by the joystick.
+    # 0x80016a12 (JSIOCGBUTTONS) returns the number of buttons supported by the joystick.
     buf = array.array('B', [0])
     ioctl(jsdev, 0x80016a11, buf) # JSIOCGAXES
     num_axes = buf[0]
@@ -195,6 +253,8 @@ def js_init():
     num_buttons = buf[0]
 
     # Get the axis map.
+    # The ioctl() call below uses the JSIOCGAXMAP request code (0x80406a32) to get the mapping of axis indices to axis types.
+    # The result is stored in 'buf', which contains the axis codes for each axis on the device.
     buf = array.array('B', [0] * 0x40)
     ioctl(jsdev, 0x80406a32, buf) # JSIOCGAXMAP
 
@@ -204,6 +264,8 @@ def js_init():
         axis_states[axis_name] = 0.0
 
     # Get the button map.
+    # The ioctl() call below uses the JSIOCGBTNMAP request code (0x80406a34) to get the mapping of button indices to button types.
+    # The result is stored in 'buf', which contains the button codes for each button on the device.
     buf = array.array('H', [0] * 200)
     ioctl(jsdev, 0x80406a34, buf) # JSIOCGBTNMAP
 
@@ -215,23 +277,35 @@ def js_init():
     print('%d axes found: %s' % (num_axes, ', '.join(axis_map)))
     print('%d buttons found: %s' % (num_buttons, ', '.join(button_map)))
 
+    # Start the joystick event reading thread
     thread_1 = threading.Thread(target=js_thread_v2, args=(0,1))
     thread_1.start()
 
 
 
 def js_deinit():
+    """
+    Deinitialize the joystick device and stop the event reading thread.
+    
+    This function:
+    1. Signals the joystick reading thread to stop by setting the 'done' flag to True
+    2. Closes the joystick file object and file descriptor
+    3. Waits for the thread to finish execution
+    
+    Returns:
+        None
+    """
     global thread_1
     global jsdev
     global jsdev_os
     global done
-    done = True
-    jsdev.close()
-    os.close(jsdev_os)
-    thread_1.join()
+    done = True  # Signal the thread to stop
+    jsdev.close()  # Close the file object
+    os.close(jsdev_os)  # Close the file descriptor
+    thread_1.join()  # Wait for the thread to finish
 
 
-
+# If run as a script, initialize the joystick and print states in a loop
 if __name__ == '__main__':
     js_init()
     # Main event loop
