@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# standard imports - probably don't need all of those
 import time
 import signal
 import sys
@@ -10,91 +9,92 @@ import fcntl
 import os
 from math import cos, sin, pi
 
-# ros imports
-import rospy
-import tf
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Point,  Pose,  Quaternion,  Twist,  Vector3,  PointStamped
-from std_msgs.msg import Int16, Int32, Int32MultiArray
+# ROS 2 imports
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Int32, Int32MultiArray
+from geometry_msgs.msg import PointStamped
 
-# qtpy "driver"
 import qtpy
-
 
 done = False
 
-
-# catch Ctrl-C
 def signal_handler(sig, frame):
     global done
     print('You pressed Ctrl+C!')
-    # sys.exit(0)
-    # set the flag....
     done = True
+    #rclpy.shutdown()  # Make sure ROS shuts down
 
 
-
-def odom_reset_callback(msg: Int32):
-    print("odom reset!")
-    # TODO:  should really call an API provided by the qtpy module instead of accessing its variables....
+def odom_reset_callback(msg):
+    current_time = time.monotonic()
+    print(f"odom reset at timestamp: {current_time:.6f}!")
     qtpy.heading_calib = 0.0
     qtpy.heading_delta_calib_accumulated = 0.0
     qtpy.dps = 0.0
     qtpy.dps_max = 0.0
     return
 
-
-
-# catch Ctrl-C
 signal.signal(signal.SIGINT, signal_handler)
 
+rclpy.init()
+node = rclpy.create_node('qtpy_publisher')
 
-rospy.init_node('qtpy_publisher')
+imu_pub = node.create_publisher(PointStamped, 'imu', 5)
+line_pub = node.create_publisher(Int32MultiArray, 'line', 5)
+reset_sub = node.create_subscription(Int32, 'odom_reset', odom_reset_callback, 5)
 
-imu_pub = rospy.Publisher("imu", PointStamped, queue_size=5, tcp_nodelay=True)
-line_pub = rospy.Publisher("line", Int32MultiArray, queue_size=5, tcp_nodelay=True)
-
-reset_sub =  rospy.Subscriber("odom_reset",     Int32,  odom_reset_callback,     tcp_nodelay=True)
-
-current_time = last_time = rospy.Time.now()
-
-# initialize the qtpy "driver" module - this will open the serial port, etc. etc.
 qtpy.initialize()
 
-# the main loop rate will be governed by the rate at which the qtpy driver provides data (100Hz), 
-# hence the loop body does not contain any form of a delay or rate limiting statement
-while (not done) and (not rospy.is_shutdown()):
+# Set target loop frequency
+loop_hz = 100  # 100 Hz
+loop_period = (1.0 / loop_hz) - 0.0002  # Allow a small buffer for processing time
 
-    # get new data from the qtpy - this is a blocking call with 10ms timeout
+# Initialize counter for spin_once calls
+iteration_counter = 0
+
+while not done and rclpy.ok():
+    start_time = time.monotonic()
+    #print(start_time)
+    
+    # Process any pending callbacks (non-blocking) only once every 10 iterations
+    iteration_counter += 1
+    if iteration_counter >= 10:
+        rclpy.spin_once(node, timeout_sec=0.0)  # Set to 0 to make it truly non-blocking
+        iteration_counter = 0
+
+    result = False
     result = qtpy.update()
-
-    if result != True:
-        # 99 out of 100 times there will be new data at this point, because the call to .update() is semi-blocking
-        # but if there was not new data, simply skip the rest of this loop
-        continue
-
-    # for timestamping purposes....
-    current_time = rospy.Time.now()
-
-    # we might need this timestamp too....works better for print() statements
-    t = time.monotonic()
-
-    #print("%8d, %7.3f, %8.4f, %8.4f, %11.2f, dps=%6.2f" % (qtpy.timestamp, t,
-    #    qtpy.heading_calib, qtpy.heading_uncal_new, qtpy.heading_delta_calib_accumulated, qtpy.dps))
-
-    # publish the imu data via the standard message type "PointStamped", because it contains room for 3 floats and a timestamp
-    # could be using the actual message type that is intended for IMU data here, but that type is a bit more convoluted 
-    imu_data = PointStamped()
-    imu_data.header.stamp = current_time
-    imu_data.header.frame_id = "base_link"
-    imu_data.point.x = qtpy.heading_calib
-    imu_data.point.y = qtpy.heading_delta_calib_accumulated
-    imu_data.point.z = qtpy.dps
-    imu_pub.publish(imu_data)
-
-    # publish the line sensor array data as simply one-dimensional array
-    line_data = Int32MultiArray(data=qtpy.line)
-    line_pub.publish(line_data)
-   
-
+    if result:
+        current_time = node.get_clock().now().to_msg()
+        imu_data = PointStamped()
+        imu_data.header.stamp = current_time
+        imu_data.header.frame_id = "base_link"
+        imu_data.point.x = qtpy.heading_calib
+        imu_data.point.y = qtpy.heading_delta_calib_accumulated
+        imu_data.point.z = qtpy.dps
+        imu_pub.publish(imu_data)
+        line_data = Int32MultiArray(data=qtpy.line)
+        line_pub.publish(line_data)
+    else:
+        #print(time.monotonic(), "qtpy.update() returned False, skipping publishing")
+        pass
+        
+    # Calculate time to sleep and sleep only if needed
+    elapsed = time.monotonic() - start_time
+    sleep_time = loop_period - elapsed
+    if True:
+        if sleep_time > 0:
+            #print(f"Sleeping for {sleep_time:.4f} seconds")
+            time.sleep(sleep_time)
+        else:
+            # If we're running behind, just yield to the OS briefly
+            time.sleep(0.001)
+    else:
+        # If we're not sleeping, just yield to the OS briefly
+        time.sleep(0.001)
+        
+time.sleep(0.2)  # Give some time for the last messages to be sent
 qtpy.deinitialize()
+time.sleep(0.2)  # Give some time for the last messages to be sent
+node.destroy_node()
