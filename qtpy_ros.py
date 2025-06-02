@@ -17,23 +17,78 @@ from geometry_msgs.msg import PointStamped
 
 import qtpy
 
+# Global flags for thread coordination
 done = False
+ros_thread_running = False
+qtpy_lock = threading.Lock()  # Lock for thread-safe qtpy operations
+shutdown_lock = threading.Lock()  # Lock for coordinating shutdown
+shutdown_called = False
 
 def signal_handler(sig, frame):
     global done
     print('You pressed Ctrl+C!')
     done = True
-    #rclpy.shutdown()  # Make sure ROS shuts down
 
 
 def odom_reset_callback(msg):
     current_time = time.monotonic()
     print(f"odom reset at timestamp: {current_time:.6f}!")
-    qtpy.heading_calib = 0.0
-    qtpy.heading_delta_calib_accumulated = 0.0
-    qtpy.dps = 0.0
-    qtpy.dps_max = 0.0
+    # Thread-safe access to qtpy variables
+    with qtpy_lock:
+        qtpy.heading_calib = 0.0
+        qtpy.heading_delta_calib_accumulated = 0.0
+        qtpy.dps = 0.0
+        qtpy.dps_max = 0.0
     return
+
+
+def ros_spin_thread(node):
+    """Dedicated thread for handling ROS callbacks and spinning"""
+    global ros_thread_running, done
+    ros_thread_running = True
+    print("ROS spin thread started")
+    
+    try:
+        while not done and rclpy.ok():
+            rclpy.spin_once(node, timeout_sec=0.1)
+    except Exception as e:
+        print(f"ROS spin thread error: {e}")
+    finally:
+        ros_thread_running = False
+        print("ROS spin thread stopped")
+
+
+def safe_shutdown():
+    """Thread-safe shutdown function"""
+    global shutdown_called
+    with shutdown_lock:
+        if shutdown_called:
+            return
+        shutdown_called = True
+        
+        print("Performing safe shutdown...")
+        
+        # Clean up qtpy
+        try:
+            qtpy.deinitialize()
+        except Exception as e:
+            print(f"Error during qtpy deinitialize: {e}")
+        
+        # Clean up ROS node
+        try:
+            if 'node' in globals():
+                node.destroy_node()
+        except Exception as e:
+            print(f"Error destroying node: {e}")
+        
+        # Only shutdown ROS if it's still running
+        try:
+            if rclpy.ok():
+                rclpy.shutdown()
+        except Exception as e:
+            print(f"Error during ROS shutdown: {e}")
+        
+        print("Shutdown completed")
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -46,55 +101,51 @@ reset_sub = node.create_subscription(Int32, 'odom_reset', odom_reset_callback, 5
 
 qtpy.initialize()
 
-# Set target loop frequency
-loop_hz = 100  # 100 Hz
-loop_period = (1.0 / loop_hz) - 0.0002  # Allow a small buffer for processing time
+# Start the ROS spinning thread
+ros_thread = threading.Thread(target=ros_spin_thread, args=(node,), daemon=True)
+ros_thread.start()
 
-# Initialize counter for spin_once calls
-iteration_counter = 0
+
+print("Starting main sensor loop")
 
 while not done and rclpy.ok():
-    start_time = time.monotonic()
-    #print(start_time)
     
-    # Process any pending callbacks (non-blocking) only once every 10 iterations
-    iteration_counter += 1
-    if iteration_counter >= 10:
-        rclpy.spin_once(node, timeout_sec=0.0)  # Set to 0 to make it truly non-blocking
-        iteration_counter = 0
-
-    result = False
-    result = qtpy.update()
+    # Update sensors with thread-safe access
+    with qtpy_lock:
+        result = qtpy.update() # non-blocking update of qtpy sensors
+        if result:
+            # Copy data while holding the lock
+            heading_calib = qtpy.heading_calib
+            heading_delta_calib_accumulated = qtpy.heading_delta_calib_accumulated
+            dps = qtpy.dps
+            line_data_copy = qtpy.line.copy() if hasattr(qtpy.line, 'copy') else list(qtpy.line)
+    
+    # Publish data outside of the lock
     if result:
         current_time = node.get_clock().now().to_msg()
         imu_data = PointStamped()
         imu_data.header.stamp = current_time
         imu_data.header.frame_id = "base_link"
-        imu_data.point.x = qtpy.heading_calib
-        imu_data.point.y = qtpy.heading_delta_calib_accumulated
-        imu_data.point.z = qtpy.dps
-        imu_pub.publish(imu_data)
-        line_data = Int32MultiArray(data=qtpy.line)
-        line_pub.publish(line_data)
+        imu_data.point.x = heading_calib
+        imu_data.point.y = heading_delta_calib_accumulated
+        imu_data.point.z = dps
+        if not done: imu_pub.publish(imu_data)
+        line_data = Int32MultiArray(data=line_data_copy)
+        if not done: line_pub.publish(line_data)
+        #time.sleep(0.003)
     else:
-        #print(time.monotonic(), "qtpy.update() returned False, skipping publishing")
+        #time.sleep(0.001)  # Sleep briefly if no update was made
         pass
         
-    # Calculate time to sleep and sleep only if needed
-    elapsed = time.monotonic() - start_time
-    sleep_time = loop_period - elapsed
-    if True:
-        if sleep_time > 0:
-            #print(f"Sleeping for {sleep_time:.4f} seconds")
-            time.sleep(sleep_time)
-        else:
-            # If we're running behind, just yield to the OS briefly
-            time.sleep(0.001)
-    else:
-        # If we're not sleeping, just yield to the OS briefly
-        time.sleep(0.001)
-        
-time.sleep(0.2)  # Give some time for the last messages to be sent
-qtpy.deinitialize()
-time.sleep(0.2)  # Give some time for the last messages to be sent
-node.destroy_node()
+
+print("Main loop ended, cleaning up...")
+
+# Wait for ROS thread to finish
+if ros_thread.is_alive():
+    print("Waiting for ROS thread to finish...")
+    ros_thread.join(timeout=2.0)
+    if ros_thread.is_alive():
+        print("ROS thread did not finish gracefully")
+
+# Perform safe shutdown
+safe_shutdown()
