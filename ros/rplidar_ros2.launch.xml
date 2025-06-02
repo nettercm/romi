@@ -1,0 +1,10 @@
+<launch>
+    <node pkg="rplidar_ros" exec="rplidar_composition" name="rplidar_node" output="screen">
+        <param name="serial_port" value="/dev/ttyS0"/>
+        <param name="serial_baudrate" value="115200"/>
+        <param name="frame_id" value="laser"/>
+        <param name="inverted" value="false"/>
+        <param name="angle_compensate" value="true"/>
+        <param name="scan_mode" value="Boost"/>
+    </node>
+</launch>
